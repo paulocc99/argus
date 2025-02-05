@@ -1,0 +1,11 @@
+*.log
+*.bak
+*.pyc
+*.db
+__pycache__
+
+.vscode
+.idea
+build
+
+**/trash
