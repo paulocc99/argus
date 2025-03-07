@@ -153,6 +153,14 @@ export async function runBaselineAnalytic(id) {
     return await apiClient.post(`/baseline/analytics/${id}/run`);
 }
 
+export async function getBaselineAnalyticsForImport(params) {
+    return await apiClient.get('/baseline/analytics/native', { params });
+}
+
+export async function postBaselineAnalyticImport(codes) {
+    return await apiClient.post('/baseline/analytics/import', { codes: codes });
+}
+
 // Datasources
 export async function getDatasources() {
     return await apiClient.get('/management/datasources');
@@ -288,7 +296,17 @@ export async function postLogout() {
     return await apiClient.post('/auth/logout');
 }
 
-// Health
+// Health & Setup
 export async function getHealth() {
-    return await apiClient.get('/setup/health');
+    return await apiClient.get('/health');
+}
+
+export async function postSetup(email, password) {
+    // await getLoginToken();
+    const loginData = { email: email, password: password };
+    return await apiClient.post('/setup', loginData);
+}
+
+export async function getStatus() {
+    return await apiClient.get('/setup/status');
 }

@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-    // baseURL: '/api',
-    baseURL: 'http://localhost:1337/api',
+    baseURL: '/api',
     headers: {
         'Content-type': 'application/json'
     },
@@ -13,8 +12,8 @@ const axiosClient = axios.create({
 axiosClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        console.log(error.response);
-        if ([401, 403].includes(error.response.status)) {
+        // console.log(error.response);
+        if ([401].includes(error.response.status)) {
             localStorage.clear();
             window.location = '/login';
         }
