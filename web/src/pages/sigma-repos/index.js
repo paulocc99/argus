@@ -108,7 +108,7 @@ const SigmaRepositories = () => {
             const data = response.data.map((e) => ({ value: e.name, label: capitalizeWord(e.name) }));
             setDataSources(data);
         } catch (error) {
-            setError(error.message);
+            setError(error);
         }
     };
 
@@ -118,7 +118,7 @@ const SigmaRepositories = () => {
             setSigmaRepositories(response.data);
             //setPages(response.data.pages);
         } catch (error) {
-            setError(error.message);
+            setError(error);
         }
     };
 
@@ -128,7 +128,7 @@ const SigmaRepositories = () => {
             setSuccess('Sigma repository created');
             fetchSigmaRepositories();
         } catch (error) {
-            setError('Error on repository creation', error.message);
+            setError(error);
         }
     };
 
@@ -139,7 +139,7 @@ const SigmaRepositories = () => {
             setSuccess('Sigma repository updated');
             fetchSigmaRepositories();
         } catch (error) {
-            setError('Error on repository update', error.message);
+            setError(error);
         }
     };
 
@@ -149,7 +149,7 @@ const SigmaRepositories = () => {
             setSuccess('Sigma repository deleted');
             fetchSigmaRepositories();
         } catch (error) {
-            setError('Error on repository deletion', error.message);
+            setError(error, 'Error on repository deletion');
         }
     };
 
@@ -236,7 +236,7 @@ const SigmaRepositories = () => {
                             Data Sources
                         </Typography>
                         <Grid container spacing={1} direction="row" justifyContent="center" alignItems="center" sx={{ mt: 1 }}>
-                            {selSigmaRepository?.mappings?.map((m, index, mappings) => (
+                            {selSigmaRepository?.mappings?.map((m, index) => (
                                 <>
                                     <Grid item xs={6}>
                                         <FormControl fullWidth>

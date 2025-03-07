@@ -152,7 +152,7 @@ function BaseAlertDialog(props) {
                 setProfillerData(response.data);
             }
         } catch (error) {
-            setError('Error on profiler.', error.message);
+            setError(error, 'Error on profiler.');
         }
     };
 
@@ -161,7 +161,7 @@ function BaseAlertDialog(props) {
             const response = await getAlertEvents(alert.uuid);
             setEvents(response.data);
         } catch (error) {
-            setError('Error on asset retrieval', error.message);
+            setError(error, 'Error on asset retrieval');
         }
     };
 
@@ -378,16 +378,23 @@ export default function AlertDialog(props) {
             setState(newState);
             setSuccess('State updated.');
         } catch (error) {
-            setError('Failed to update alert status', error);
+            setError(error, 'Failed to update alert status');
         }
     };
 
-    const canUpdateState = alert?.status == 'resolved';
-    const getStatusMessage = alert?.status == 'open' ? 'Process' : alert?.status == 'processing' ? 'Resolve' : 'Resolved';
+    const canUpdateState = alert?.status !== 'resolved';
+    const getStatusMessage = alert?.status == 'open' ? 'Review' : alert?.status == 'processing' ? 'Resolve' : 'Resolved';
     return (
         <Dialog open={open} onClose={handleOnClose} maxWidth={dialogMaxWidth}>
             <DialogContent sx={{ minWidth: '550px' }}>{getDialog()}</DialogContent>
-            <DialogActions>{!canUpdateState && <Button onClick={updateState}>{getStatusMessage}</Button>}</DialogActions>
+            <Divider />
+            {canUpdateState && (
+                <DialogActions>
+                    <Button variant="contained" onClick={updateState}>
+                        {getStatusMessage}
+                    </Button>
+                </DialogActions>
+            )}
         </Dialog>
     );
 }

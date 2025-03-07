@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
 
 import SortedTableHead, { getComparator, stableSort } from 'common/SortedTableHead';
 import { capitalizeWord } from 'utils';

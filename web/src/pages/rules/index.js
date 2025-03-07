@@ -14,7 +14,7 @@ import SearchBox from 'components/SearchBox';
 import MainCard from 'components/cards/MainCard';
 import FilterTextField from 'components/FilterTextField';
 import ConfirmationDialog from 'components/ConfirmationDialog';
-import RuleExternalDialog from './RuleExternalDialog';
+import RuleExternalDialog from './external/RuleExternalDialog';
 import RuleTable from './RuleTable';
 
 const RuleList = () => {
@@ -32,11 +32,12 @@ const RuleList = () => {
     const [riskFilter, setRiskFilter] = useState('none');
     const [activeFilter, setActiveFilter] = useState('none');
 
+    // Dialogs
     const [externalDialog, setExternalDialog] = useState(false);
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [deleteData, setDeleteData] = useState();
 
-    const handlePageChange = (event, value) => {
+    const handlePageChange = (e, value) => {
         setPage(value);
     };
 
@@ -61,7 +62,7 @@ const RuleList = () => {
             setRuleCount(size);
             setPages(pages);
         } catch (error) {
-            setError("Couldn't retrieve rules", error);
+            setError(error, "Couldn't retrieve rules");
         }
     };
 
@@ -71,7 +72,7 @@ const RuleList = () => {
             await updateRuleState(id, data);
             setSuccess('Rule state updated');
         } catch (error) {
-            setError("Couldn't update rule state", error.message);
+            setError(error, "Couldn't update rule state");
         }
     };
 
@@ -80,7 +81,7 @@ const RuleList = () => {
             await postImportRule(ids);
             setSuccess('Rules imported with success');
         } catch (error) {
-            setError('Error on rule import', error.message);
+            setError(error, 'Error on rule import');
         }
     };
 
@@ -95,7 +96,7 @@ const RuleList = () => {
             setSuccess('Rule deleted');
             setRuleList(ruleList.filter((e) => e.uuid != deleteData.id));
         } catch (error) {
-            setError('Error on rule deletion', error.message);
+            setError(error, 'Error on rule deletion');
         } finally {
             setDeleteDialog(false);
         }
@@ -112,7 +113,6 @@ const RuleList = () => {
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <Typography variant="h5">{`Rules (${ruleCount})`}</Typography>
-                            {/*<Typography variant="body2">{`6 rules available`}</Typography>*/}
                         </Grid>
                         <Stack direction="row" spacing={3} alignItems="right" sx={{ mr: 1 }}>
                             <SearchBox search={(e) => setSearchTerm(e)} placeholder="Rule name" />
@@ -189,6 +189,7 @@ const RuleList = () => {
                 title={deleteData?.title}
                 content="Are you sure you want to delete this rule?"
                 btn="Delete"
+                color="error"
                 open={deleteDialog}
                 onClose={() => setDeleteDialog(false)}
                 onConfirm={removeRule}

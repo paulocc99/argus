@@ -43,7 +43,7 @@ function RuleProfilerDialog(props) {
             const response = await postFieldProfiler(postData);
             setData(response.data);
         } catch (error) {
-            setError('Error on profilling', error.message);
+            setError(error, 'Error on profilling');
         } finally {
             setLoading(false);
         }
@@ -61,7 +61,7 @@ function RuleProfilerDialog(props) {
             console.log(response.data);
             setData(response.data);
         } catch (error) {
-            setError('Error on reverse lookup', error.message);
+            setError(error, 'Error on reverse lookup');
         } finally {
             setLoading(false);
         }

@@ -55,7 +55,7 @@ export default function Profile(props) {
             setUsername(username);
             setEmail(email);
         } catch (error) {
-            setError('', error.message);
+            setError(error);
         }
     };
 
@@ -86,6 +86,7 @@ export default function Profile(props) {
                                 newPassword: Yup.string().max(255).required('A new password is required'),
                                 newPasswordConfirmation: Yup.string().oneOf([Yup.ref('newPassword')], 'Passwords must match')
                             })}
+                            on
                             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                                 try {
                                     const data = {
@@ -93,7 +94,6 @@ export default function Profile(props) {
                                         new_password: values.newPassword,
                                         confirmation: values.newPasswordConfirmation
                                     };
-                                    console.log(data);
                                     await updateUserPassword(data);
                                     setStatus({ success: true });
                                     setSuccess('Password changed');

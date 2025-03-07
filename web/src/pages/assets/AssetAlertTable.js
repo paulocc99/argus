@@ -23,10 +23,10 @@ const headCells = [
         label: 'Time'
     },
     {
-        id: 'rule',
+        id: 'source',
         align: 'left',
         disablePadding: true,
-        label: 'Rule'
+        label: 'Source'
     },
     {
         id: 'status',
@@ -61,6 +61,7 @@ export default function AssetAlertTable(props) {
                     <TableBody>
                         {stableSort(alerts, getComparator(order, orderBy)).map((alert, index) => {
                             const isItemSelected = isSelected(alert.uuid);
+                            const name = alert.rule?.name || alert.analytic?.name;
 
                             return (
                                 <TableRow
@@ -82,7 +83,7 @@ export default function AssetAlertTable(props) {
                                         <AlertType type={alert.type} panic={alert.panic} />
                                     </TableCell>
                                     <TableCell align="left">{datetimeToStr(alert.created_at)}</TableCell>
-                                    <TableCell align="left">{alert.rule.name}</TableCell>
+                                    <TableCell align="left">{name}</TableCell>
                                     <TableCell align="left">
                                         <AlertStatus status={alert.status} title={alert.status} />
                                     </TableCell>

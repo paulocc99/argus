@@ -95,7 +95,7 @@ export default function RuleTable(props) {
             await runRule(id);
             setSuccess('Rule run completed.');
         } catch (error) {
-            setError(error.response.data.message);
+            setError(error);
         } finally {
             setRunning([...running].filter((e) => e != id));
         }

@@ -11,7 +11,6 @@ export default function NoData(props) {
 
     return (
         <Grid display="flex" justifyContent="center" alignItems="center" sx={gridSX}>
-            {/*<SearchOffIcon style={{ color: 'gray' }} />*/}
             {icon}
             <Typography style={{ color: 'gray' }} variant="body1">
                 {message || 'No data'}

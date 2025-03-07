@@ -93,7 +93,7 @@ const IngestPipelines = () => {
             setPipelines(response.data.pipelines.reverse());
             setPages(response.data.pages);
         } catch (error) {
-            setError("Couldn't retrieve ingest pipelines", error.message);
+            setError(error, "Couldn't retrieve ingest pipelines");
         }
     };
 
@@ -104,7 +104,7 @@ const IngestPipelines = () => {
             setDOpen(false);
             fetchIngestPipelines();
         } catch (error) {
-            setError('Error on pipeline update', error.message);
+            setError(error, 'Error on pipeline update');
         }
     };
 
@@ -120,7 +120,7 @@ const IngestPipelines = () => {
             setFailedProcessorsData(JSON.stringify(pipeline.on_failure, null, 4));
             setSuccess('Pipeline uploaded');
         } catch (error) {
-            setError('Error on pipeline upload', error.message);
+            setError(error, 'Error on pipeline upload');
         }
     };
 
@@ -130,7 +130,7 @@ const IngestPipelines = () => {
             fetchIngestPipelines();
             setSuccess('Pipeline deleted');
         } catch (error) {
-            setError('Error on pipeline deletion', error.message);
+            setError(error, 'Error on pipeline deletion');
         }
     };
 

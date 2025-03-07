@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { Grid, Stack, Typography, MenuItem } from '@mui/material';
 
@@ -29,11 +29,11 @@ const AlertList = () => {
 
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(1);
-    const [dOpen, setDOpen] = useState(false);
+    const [alertDialog, setAlertDialog] = useState(false);
 
     // Handlers
-    const handleClose = () => {
-        setDOpen(false);
+    const handleDialogClose = () => {
+        setAlertDialog(false);
     };
 
     const handleAlertStateChange = (newState) => {
@@ -61,11 +61,11 @@ const AlertList = () => {
             };
             const response = await getAlerts(params);
             const { alerts, size, pages } = response.data;
-            setAlertList(alerts.reverse());
+            setAlertList(alerts);
             setAlertCount(size);
             setPages(pages);
         } catch (error) {
-            setError('Error on alert retrieval', error.message);
+            setError(error, 'Error on alert retrieval');
         }
     };
 
@@ -75,7 +75,7 @@ const AlertList = () => {
             const validAssets = response.data.filter((asset) => asset.name);
             setAssetList([assetPlaceHolder, ...validAssets]);
         } catch (error) {
-            setError('Error on asset retrieval', error.message);
+            setError(error, 'Error on asset retrieval');
         }
     };
 
@@ -86,7 +86,7 @@ const AlertList = () => {
             setAlertList(updatedAlerts);
             setSuccess('Alert state updated');
         } catch (error) {
-            setError("Couldn't update alert status", error.message);
+            setError(error, "Couldn't update alert status");
         }
     };
 
@@ -95,8 +95,12 @@ const AlertList = () => {
     }, []);
 
     useEffect(() => {
-        if (selectedAlert) setDOpen(true);
+        if (selectedAlert) setAlertDialog(true);
     }, [selectedAlert]);
+
+    useEffect(() => {
+        if (!alertDialog) setSelectedAlert(undefined);
+    }, [alertDialog]);
 
     useEffect(() => {
         fetchAlerts();
@@ -208,7 +212,7 @@ const AlertList = () => {
                     </MainCard>
                 </Grid>
             </Grid>
-            <AlertDialog open={dOpen} close={handleClose} alert={selectedAlert} setState={handleAlertStateChange} />
+            <AlertDialog open={alertDialog} close={handleDialogClose} alert={selectedAlert} setState={handleAlertStateChange} />
         </ComponentSkeleton>
     );
 };

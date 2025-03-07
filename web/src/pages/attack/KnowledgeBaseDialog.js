@@ -52,7 +52,7 @@ export default function KnowledgeBaseDialog(props) {
             const response = await getATTACKTactics('ics', true);
             setTactics(response.data.tactics);
         } catch (error) {
-            setError("Couldn't load ATT&CK tactics and techniques.", error.message);
+            setError(error, "Couldn't load ATT&CK tactics and techniques.");
         }
     };
 
@@ -61,7 +61,7 @@ export default function KnowledgeBaseDialog(props) {
             const response = await getATTACKDatasources('ics', true);
             setDatasources(response.data.datasources);
         } catch (error) {
-            setError("Couldn't load ATT&CK datasources.", error.message);
+            setError(error, "Couldn't load ATT&CK datasources.");
         }
     };
 
@@ -70,7 +70,7 @@ export default function KnowledgeBaseDialog(props) {
             const response = await getATTACKGroups('ics', true);
             setGroups(response.data.groups);
         } catch (error) {
-            setError("Couldn't load ATT&CK groups.", error.message);
+            setError(error, "Couldn't load ATT&CK groups.");
         }
     };
 
@@ -79,7 +79,7 @@ export default function KnowledgeBaseDialog(props) {
             const response = await getATTACKSoftware('ics', true);
             setSoftware(response.data.software);
         } catch (error) {
-            setError("Couldn't load ATT&CK software.", error.message);
+            setError(error, "Couldn't load ATT&CK software.");
         }
     };
 

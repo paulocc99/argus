@@ -36,11 +36,11 @@ export default function DashboardDefault() {
     const [loadingStats, setLoadingStats] = useState(false);
     const [selAlert, setSelAlert] = useState(undefined);
     const [openAlerts, setOpenAlerts] = useState([]);
-    const [dOpen, setDOpen] = useState(false);
+    const [alertDialog, setAlertDialog] = useState(false);
 
     // Handlers
-    const handleClose = () => {
-        setDOpen(false);
+    const handleDialogClose = () => {
+        setAlertDialog(false);
     };
 
     const handleAlertBtn = (alert) => {
@@ -69,14 +69,18 @@ export default function DashboardDefault() {
             const response = await getAlerts(params);
             setOpenAlerts(response.data);
         } catch (error) {
-            setError('Error on alert retrival.', error.message);
+            setError(error, 'Error on alert retrival.');
         }
     };
 
     // Hooks
     useEffect(() => {
-        if (selAlert) setDOpen(true);
+        if (selAlert) setAlertDialog(true);
     }, [selAlert]);
+
+    useEffect(() => {
+        if (!alertDialog) setSelAlert(undefined);
+    }, [alertDialog]);
 
     useEffect(() => {
         fetchStats();
@@ -165,7 +169,7 @@ export default function DashboardDefault() {
                     <NoData icon={<NotificationsOffIcon style={{ color: 'gray' }} />} message="No alerts at this time." height="300px" />
                 )}
             </Grid>
-            <AlertDialog open={dOpen} close={handleClose} alert={selAlert} />
+            <AlertDialog open={alertDialog} close={handleDialogClose} alert={selAlert} />
         </Grid>
     );
 }

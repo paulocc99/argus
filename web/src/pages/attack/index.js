@@ -119,7 +119,7 @@ const ATTACK = () => {
             };
             setAlertStats(alertData);
         } catch (error) {
-            setError('Error while retriving alert statistics.', error.message);
+            setError(error, 'Error while retriving alert statistics');
         }
     };
 
@@ -129,7 +129,7 @@ const ATTACK = () => {
             const { tactics } = response.data;
             setATTACKTTP(tactics);
         } catch (error) {
-            setError("Couldn't retrieve ATT&CK tactics", error.message);
+            setError(error, "Couldn't retrieve ATT&CK tactics");
         }
     };
 

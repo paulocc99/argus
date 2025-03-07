@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import {
     Box,
     Stack,
-    Typography,
     Dialog,
     DialogContent,
     DialogActions,
@@ -60,7 +59,7 @@ export default function AssetDialog(props) {
             setAlerts(response.data.alerts.reverse());
             setAlertsPages(response.data.pages);
         } catch (error) {
-            setError("Couldn't retrieve asset alerts.", error.message);
+            setError(error, "Couldn't retrieve asset alerts.");
         }
     };
 
@@ -71,11 +70,10 @@ export default function AssetDialog(props) {
                 q: searchQuery
             };
             const response = await getAssetEvents(asset.uuid, params);
-
             setEvents(response.data.events);
             setEventsPages(response.data.pages);
         } catch (error) {
-            setError("Couldn't retrieve asset events", error.message);
+            setError(error, "Couldn't retrieve asset events");
         }
     };
 

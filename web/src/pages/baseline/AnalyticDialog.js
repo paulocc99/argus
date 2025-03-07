@@ -161,7 +161,7 @@ export default function AnalyticDialog(props) {
             const response = await postProfileAnalytic(analytic);
             setProfilerData(response.data);
         } catch (error) {
-            setError('Error on profilling.', error.message);
+            setError(error, 'Error on analytic profilling.');
         } finally {
             setProfilerLoading(false);
         }
@@ -176,7 +176,7 @@ export default function AnalyticDialog(props) {
                 const response = await getFields(ds);
                 allDataSourceFields = [...allDataSourceFields, ...response.data];
             } catch (error) {
-                setError("Coudln't retrieve datasource fields.", error.message);
+                setError(error, "Coudln't retrieve datasource fields.");
             }
         }
         allDataSourceFields = allDataSourceFields.filter((f, index) => allDataSourceFields.findIndex((i) => i.field == f.field) == index);
@@ -189,7 +189,17 @@ export default function AnalyticDialog(props) {
             const response = await getAssets({ nameOnly: true });
             setAssets(response.data);
         } catch (error) {
-            setError('', error.message);
+            setError(error);
+        }
+    };
+
+    const fetchDatasources = async () => {
+        try {
+            const response = await getDatasources();
+            const currentDS = response.data.map((d) => d.name).filter((e) => e !== 'baseline');
+            setDataSources([...currentDS, 'ALL']);
+        } catch (error) {
+            setError(error);
         }
     };
 
@@ -198,12 +208,11 @@ export default function AnalyticDialog(props) {
         if (!open) {
             setProfilerData(profilerProp);
             setTab(0);
+            return;
         }
 
         if (!analytic) return;
-        getDatasources()
-            .then((response) => setDataSources(response.data.map((d) => d.name)))
-            .catch((error) => console.log(error.message));
+        fetchDatasources();
         fetchFields(analytic.datasources);
 
         if (analytic.category == 'asset') fetchAssets();
@@ -387,7 +396,11 @@ export default function AnalyticDialog(props) {
                 {isAssetType && (
                     <TabPanel value={tab} index={1}>
                         <Grid item xs={12} sx={{ mt: 2 }}>
-                            <AssetActiveTable assets={assets} active={analytic.asset_control} update={updateActiveAsset} />
+                            {assets?.length > 0 ? (
+                                <AssetActiveTable assets={assets} active={analytic.asset_control} update={updateActiveAsset} />
+                            ) : (
+                                <NoData message="No assets available." height="450px" />
+                            )}
                         </Grid>
                     </TabPanel>
                 )}
@@ -395,20 +408,6 @@ export default function AnalyticDialog(props) {
                     <ComponentLoader loading={profilerLoading}>
                         {profilerData.base?.length > 0 || (profilerData.latest?.length > 0 && analytic) ? (
                             <Grid item xs={12} sx={{ mt: 2 }}>
-                                {/*                            <FormControl fullWidth>
-                                <HTypography variant="h6">Group By</HTypography>
-                                <Autocomplete
-                                    multiple
-                                    id="profiler-groupby"
-                                    size="small"
-                                    options={getAnalyticFields(analytic)}
-                                    getOptionLabel={(option) => option}
-                                    defaultValue={[]}
-                                    value={profilerGroupBy}
-                                    onChange={(e, value) => setProfilerGroupBy(value)}
-                                    renderInput={(params) => <TextField {...params} label="" placeholder="Asset" />}
-                                />
-                            </FormControl>*/}
                                 <Box sx={{ borderBottom: 0, borderColor: 'divider' }}>
                                     <Tabs value={tabProfiler} onChange={handleTabProfilerChange}>
                                         <Tab label={`Baseline (${profilerData?.base?.length})`} {...a11yProps(0)} />
@@ -444,21 +443,18 @@ export default function AnalyticDialog(props) {
                                 </TabPanel>
                             </Grid>
                         ) : (
-                            <Grid display="flex" justifyContent="center" alignItems="center" sx={{ mt: 2, height: '500px' }}>
-                                <SearchOffIcon style={{ color: 'gray' }} />
-                                <Typography style={{ color: 'gray' }} variant="body1">
-                                    No profiler information
-                                </Typography>
-                            </Grid>
+                            <NoData message="No profiler information." icon={<SearchOffIcon style={{ color: 'gray' }} />} height="450px" />
                         )}
                     </ComponentLoader>
                 </TabPanel>
             </DialogContent>
             <DialogActions style={{ justifyContent: 'space-between' }}>
-                {action !== 'new' && <Button onClick={remove}>Delete</Button>}
+                {action !== 'new' ? <Button onClick={remove}>Delete</Button> : <br></br>}
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     {isAssetType && tab === 1 && (
-                        <Button onClick={() => setEnableAll(!enableAll)}>{`${enableAll ? 'Enable' : 'False'} All`}</Button>
+                        <Button disabled={!assets?.length} onClick={() => setEnableAll(!enableAll)}>{`${
+                            enableAll ? 'Enable' : 'Disable'
+                        } All`}</Button>
                     )}
                     <Button onClick={profileAnalytic} disabled={profilerLoading}>
                         Preview

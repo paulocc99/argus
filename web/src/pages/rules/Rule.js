@@ -248,9 +248,9 @@ function Rule() {
         try {
             const response = await getDatasources();
             const ds = response.data.map((e) => e.name);
-            setDataSources([...ds, 'baseline']);
+            setDataSources([...ds, 'ALL']);
         } catch (error) {
-            setError("Couldn't retrieve datasources", error.message);
+            setError(error, "Couldn't retrieve datasources");
         }
     };
 
@@ -283,7 +283,7 @@ function Rule() {
             setAlerts(result.alert ? result.alert : []);
             setAlarms(result.alarm ? result.alarm : []);
         } catch (error) {
-            setError('Error on rule execution preview', error.message);
+            setError(error);
         } finally {
             setPreviewLoading(false);
         }
@@ -292,23 +292,15 @@ function Rule() {
     const handleFormSubmit = async () => {
         try {
             let attackData = { ...attackSelected };
-            console.log(attackSelected);
             attackData.tactics = attackData.tactics.map((t) => t.id);
             attackData.techniques = attackData.techniques.map((t) => t.id);
+
             let postData = {
                 ...ruleData,
-                // name: ruleName,
-                // description: ruleDescription,
                 datasources: ruleDatasource,
                 type: ruleData.type.toLowerCase(),
                 risk: parseInt(ruleData.risk),
-                // trigger: { ...trigger },
-                // timeframe: timeframe,
                 attack: attackData
-                /*                intelligence: {
-                    note: note,
-                    action: policyAction
-                }*/
             };
             if (ruleData.type == 'eql') {
                 postData = {
@@ -324,6 +316,7 @@ function Rule() {
                     conditions: conditions
                 };
             }
+
             if (params.id) {
                 await updateRule(params.id, postData);
             } else {
@@ -332,7 +325,7 @@ function Rule() {
             }
             setSuccess(`Rule ${params.id ? 'Updated' : 'Created'}`);
         } catch (error) {
-            setError(`Error on rule ${params.id ? 'update' : 'creation'}`);
+            setError(error, `Error on rule ${params.id ? 'update' : 'creation'}`);
         }
     };
 
@@ -344,7 +337,7 @@ function Rule() {
                 allDataSourceFields = [...allDataSourceFields, ...response.data];
             }
         } catch (error) {
-            setError("Couldn't retrieve datasource fields");
+            setError(error, "Couldn't retrieve datasource fields");
         } finally {
             allDataSourceFields = allDataSourceFields.filter(
                 (f, index) => allDataSourceFields.findIndex((i) => i.field == f.field) == index
@@ -390,7 +383,7 @@ function Rule() {
             setRuleAlerts(alerts);
             setPages(pages);
         } catch (error) {
-            setError("Couldn't retrieve rule alerts", error.message);
+            setError(error, "Couldn't retrieve rule alerts");
         }
     };
 
@@ -406,7 +399,7 @@ function Rule() {
             setEQLBuilder('Raw');
             setSuccess('Sigma rule converted successfully');
         } catch (error) {
-            setError('Unsupported Sigma format', error.message);
+            setError(error, 'Unsupported Sigma format');
         }
     };
 
@@ -417,7 +410,7 @@ function Rule() {
             navigate('/rules');
             setSuccess('Rule deleted');
         } catch (error) {
-            setError('Error on rule deletion', error.message);
+            setError(error, 'Error on rule deletion');
         }
     };
 
@@ -427,7 +420,7 @@ function Rule() {
             const { tactics } = response.data;
             setATTACKTactics(tactics);
         } catch (error) {
-            setError("Couldn't retrieve ATT&CK tactics", error.message);
+            setError(error, "Couldn't retrieve ATT&CK tactics");
         }
     };
 
@@ -823,6 +816,7 @@ function Rule() {
                 title={ruleData?.name}
                 content="Are you sure you want to delete this rule?"
                 btn="Delete"
+                color="error"
                 open={deleteDialog}
                 onClose={() => setDeleteDialog(false)}
                 onConfirm={removeRule}

@@ -41,7 +41,7 @@ export default function BaselineAlertDialog(props) {
             setState(newState);
             setSuccess('State updated.');
         } catch (error) {
-            setError('Failed to update alert status', error);
+            setError(error, 'Failed to update alert status');
         }
     };
 

@@ -71,7 +71,7 @@ const Datasources = () => {
             const response = await getDatasources();
             setDataSources(response.data);
         } catch (error) {
-            setError('', error.message);
+            setError(error);
         }
     };
 
@@ -82,7 +82,7 @@ const Datasources = () => {
             fetchDataSources();
             handleClose();
         } catch (error) {
-            setError('Error on datasource creation', error.message);
+            setError(error, 'Error on datasource creation');
         }
     };
 
@@ -93,7 +93,7 @@ const Datasources = () => {
             fetchDataSources();
             handleClose();
         } catch (error) {
-            setError('Error on datasource update', error.message);
+            setError(error);
         }
     };
 
@@ -103,18 +103,18 @@ const Datasources = () => {
             setSuccess('Datasource deleted');
             fetchDataSources();
         } catch (error) {
-            setError('Error on datasources deletion', error.message);
+            setError(error);
         }
     };
 
     const scanDatasources = async () => {
         try {
             setProcessing(true);
-            await postDatasourceScan();
-            setSuccess('Scan completed');
+            const { data } = await postDatasourceScan();
+            setSuccess(data.message);
             fetchDataSources();
         } catch (error) {
-            setError('Error on datasource scan', error.message);
+            setError(error);
         }
         setProcessing(false);
     };

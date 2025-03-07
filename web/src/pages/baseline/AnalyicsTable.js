@@ -85,7 +85,7 @@ export default function AnalyticsTable(props) {
             await runBaselineAnalytic(id);
             setSuccess('Analytic run completed.');
         } catch (error) {
-            setError("Couldn't run analytic", error.message);
+            setError(error, "Couldn't run analytic");
         } finally {
             setRunning([...running].filter((e) => e != id));
         }
@@ -109,7 +109,7 @@ export default function AnalyticsTable(props) {
                                     <TableCell align="left">{analytic.datasources.join(', ')}</TableCell>
                                     <TableCell align="left">{capitalizeWord(analytic.category)}</TableCell>
                                     <TableCell align="left">
-                                        {analytic.origin ? (
+                                        {analytic.origin === 'user' ? (
                                             <Chip label="CUSTOM" color="primary" />
                                         ) : (
                                             <Chip label="NATIVE" color="primary" variant="outlined" />

@@ -67,7 +67,7 @@ const Assets = () => {
             const ds = response.data.filter((e) => e.name !== 'baseline').map((e) => ({ value: e.name, label: capitalizeWord(e.name) }));
             setDataSources([...ds, ...dataSources]);
         } catch (error) {
-            setError(error.message);
+            setError(error);
         }
     };
 
@@ -85,7 +85,7 @@ const Assets = () => {
             setAssetCount(size);
             setPages(pages);
         } catch (error) {
-            setError("Couldn't retrieve assets information", error.message);
+            setError(error, "Couldn't retrieve assets information");
         }
     };
 
@@ -94,7 +94,7 @@ const Assets = () => {
             const response = await getAssetSettings();
             setSubnets(response.data.subnets);
         } catch (error) {
-            setError(error.message);
+            setError(error);
         }
     };
 
@@ -104,7 +104,7 @@ const Assets = () => {
             setSuccess('Monitoring subnets updated');
             setSOpen(false);
         } catch (error) {
-            setError(error.response.data.message, error.message);
+            setError(error);
         }
     };
 
@@ -115,7 +115,7 @@ const Assets = () => {
             setDOpen(false);
             fetchAssets();
         } catch (error) {
-            console.log(error.message);
+            setError(error);
         }
     };
 

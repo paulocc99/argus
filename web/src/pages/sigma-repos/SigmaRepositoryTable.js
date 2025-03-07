@@ -93,7 +93,7 @@ export default function SigmaRepositoryTable(props) {
             setProcessing([...processing].filter((e) => e != id));
             refresh();
         } catch (error) {
-            setError("Couldn't process repository rules", error.message);
+            setError(error, "Couldn't process repository rules");
         }
     };
 
@@ -103,7 +103,7 @@ export default function SigmaRepositoryTable(props) {
             setSuccess('Repository rules cleared.');
             refresh();
         } catch (error) {
-            setError("Couldn't process repository rules", error.message);
+            setError(error, "Couldn't process repository rules");
         }
     };
 

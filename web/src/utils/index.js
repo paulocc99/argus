@@ -46,9 +46,8 @@ export const setSuccess = (message) => {
     toast.success(message, { duration: 5000, position: 'bottom-right' });
 };
 
-export const setError = (message, errorMessage) => {
-    if (message) toast.error(message, { duration: 5000, position: 'bottom-right' });
-    console.log(errorMessage);
+export const setError = (error, message) => {
+    toast.error(message || error.response.data.message, { duration: 5000, position: 'bottom-right' });
 };
 
 export const n = (value) => {

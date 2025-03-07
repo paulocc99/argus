@@ -83,9 +83,11 @@ export default function DatasourceTable(props) {
                                         </Stack>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <IconButton color="error" onClick={(e) => handleDel(e, ds.name)}>
-                                            <DeleteIcon />
-                                        </IconButton>
+                                        {ds.name !== 'baseline' && (
+                                            <IconButton color="error" onClick={(e) => handleDel(e, ds.name)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             );
