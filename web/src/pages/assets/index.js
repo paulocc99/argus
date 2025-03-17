@@ -8,6 +8,7 @@ import { noneObject, managedList } from 'common/List';
 import { filterTextStyle } from 'themes/other';
 import FilterTextField from 'components/FilterTextField';
 import MainCard from 'components/cards/MainCard';
+import ConfirmationDialog from 'components/ConfirmationDialog';
 import AssetTable from './AssetTable';
 import AssetDialog from './AssetDialog';
 import SubnetDialog from './SubnetDialog';
@@ -22,6 +23,9 @@ const Assets = () => {
     const [assetList, setAssetList] = useState([]);
     const [assetCount, setAssetCount] = useState(0);
     const [subnets, setSubnets] = useState([]);
+
+    const [validationDialog, setValidationDialog] = useState(false);
+    const [validationData, setValidationData] = useState();
 
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(1);
@@ -58,6 +62,11 @@ const Assets = () => {
         const subs = [...subnets];
         subs[index] = value;
         setSubnets(subs);
+    };
+
+    const confirmValidation = async (asset) => {
+        setValidationDialog(true);
+        setValidationData({ title: asset.name, asset: asset });
     };
 
     // API
@@ -108,7 +117,7 @@ const Assets = () => {
         }
     };
 
-    const postAsset = async () => {
+    const postAssetUpdate = async () => {
         try {
             await updateAsset(selectedAsset);
             setSuccess('Asset information updated');
@@ -116,6 +125,19 @@ const Assets = () => {
             fetchAssets();
         } catch (error) {
             setError(error);
+        }
+    };
+
+    const validateAsset = async () => {
+        try {
+            const asset = { ...validationData.asset, validated: true };
+            await updateAsset(asset);
+            setSuccess('Asset validated');
+            await fetchAssets();
+        } catch (error) {
+            setError(error);
+        } finally {
+            setValidationDialog(false);
         }
     };
 
@@ -199,12 +221,19 @@ const Assets = () => {
                             page={page}
                             pagesNumber={pages}
                             hChange={handlePageChange}
-                            updateState={postAsset}
+                            updateState={postAssetUpdate}
+                            validate={confirmValidation}
                         />
                     </MainCard>
                 </Grid>
             </Grid>
-            <AssetDialog asset={selectedAsset} update={postAsset} updateSelAsset={updateSelAsset} open={dOpen} handleClose={handleClose} />
+            <AssetDialog
+                asset={selectedAsset}
+                update={postAssetUpdate}
+                updateSelAsset={updateSelAsset}
+                open={dOpen}
+                handleClose={handleClose}
+            />
             <SubnetDialog
                 open={sOpen}
                 subnets={subnets}
@@ -213,6 +242,15 @@ const Assets = () => {
                 remove={removeSubnet}
                 update={postAssetSettings}
                 handleClose={() => setSOpen(false)}
+            />
+            <ConfirmationDialog
+                title={validationData?.title}
+                content="Are you sure you want to validate this asset?"
+                btn="Validate"
+                color="primary"
+                open={validationDialog}
+                onClose={() => setValidationDialog(false)}
+                onConfirm={validateAsset}
             />
         </ComponentSkeleton>
     );
