@@ -1,0 +1,22 @@
+title: Windows
+code: windows.authentication.src_dst
+description: Baselines the client IP address for each Windows asset remote logon
+datasources:
+  - ALL
+category: general
+timeframe: 5m
+fields:
+  - source.ip
+  - host.ip
+filters:
+  f_0:
+    type: simple
+    field: winlog.event_id
+    operator: ==
+    value: "4624"
+  f_1:
+    type: simple
+    field: winlog.logon.type
+    operator: ==
+    value: "Network"
+issue_alert: true

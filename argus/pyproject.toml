@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "argus"
+version = "0.1.0"
+description = "Argus SIEM"
+authors = ["Argus"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+elasticsearch = "^8.17.1"
+python-benedict = "^0.34.1"
+pyyaml = "^6.0.2"
+python-dotenv = "^1.0.0"
+python-dateutil = "^2.9.0.post0"
+flask = "^3.1.0"
+mitreattack-python = "^3.0.8"
+apscheduler = "^3.11.0"
+pygithub = "^1.59.1"
+networkx = "^3.4.2"
+flask-apscheduler = "^1.13.0"
+psycopg2-binary = "^2.9.10"
+mongoengine = "^0.29.1"
+orjson = "^3.10.15"
+flask-security = "^5.5.2"
+gunicorn = "^23.0.0"
+pysigma = "^0.11.19"
+pysigma-backend-elasticsearch = "^1.1.5"
+bleach = "^6.2.0"
+
+
+[build-system]
+requires = ["poetry-core","setuptools"]
+build-backend = "poetry.core.masonry.api"
+
+
+[virtualenvs]
+in-project = true
+prefer-active-python = true
+
+
+[tool.black]
+line-length = 88

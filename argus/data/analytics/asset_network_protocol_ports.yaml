@@ -1,0 +1,11 @@
+title: Asset Network Protocol Ports
+code: network.protocol.ports
+description: For each asset, baselines the ports used by each network protocol
+datasources:
+  - ALL
+category: asset
+timeframe: 10m
+fields:
+  - network.protocol
+  - destination.port
+issue_alert: true

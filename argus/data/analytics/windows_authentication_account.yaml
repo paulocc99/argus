@@ -1,0 +1,22 @@
+title: Windows Authentication Account
+code: windows.authentication.account
+description: Baselines the Windows accounts used to login remotely in each Windows system.
+datasources:
+  - ALL
+category: general
+timeframe: 5m
+fields:
+  - host.ip
+  - winlog.event_data.TargetUserName
+filters:
+  f_0:
+    type: simple
+    field: winlog.event_id
+    operator: ==
+    value: "4624"
+  f_1:
+    type: simple
+    field: winlog.logon.type
+    operator: ==
+    value: "Network"
+issue_alert: true

@@ -1,0 +1,10 @@
+title: Asset Network Protocol
+code: network.protocol
+description: Baselines the network protocols used by each asset
+datasources:
+  - ALL
+category: asset
+timeframe: 5m
+fields:
+  - network.protocol
+issue_alert: true
