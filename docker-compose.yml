@@ -1,0 +1,37 @@
+
+services:
+  argus:
+    build: ./argus
+    image: argus:local
+    container_name: argus
+    restart: unless-stopped
+    env_file: argus/production.env
+    volumes:
+    - data-vol:/opt/app/data
+    depends_on:
+    - mongodb
+
+  mongodb:
+    image: mongo:6.0.5
+    container_name: argus-db
+    restart: unless-stopped
+    env_file: mongo.env
+    # ports:
+    # - 127.0.0.1:27017:27017
+    volumes:
+    - db-vol:/data/db
+    - ./docker_scripts/:/docker-entrypoint-initdb.d
+
+  nginx:
+    build: ./web
+    image: argus-web:local
+    container_name: argus-web
+    restart: unless-stopped
+    ports:
+    - 9000:80
+    depends_on:
+    - argus
+
+volumes:
+  data-vol:
+  db-vol:
