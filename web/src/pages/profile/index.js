@@ -12,8 +12,7 @@ import {
     IconButton,
     InputAdornment,
     Typography,
-    Divider,
-    Chip
+    Divider
 } from '@mui/material';
 
 import * as Yup from 'yup';
@@ -110,11 +109,18 @@ export default function Profile(props) {
                                     <Grid item xs={6}>
                                         <Stack spacing={1}>
                                             <InputLabel htmlFor="username">Username</InputLabel>
-                                            <OutlinedInput fullWidth id="username" value={username} name="username" onBlur={handleBlur} />
+                                            <OutlinedInput
+                                                fullWidth
+                                                disabled
+                                                id="username"
+                                                value={username}
+                                                name="username"
+                                                onBlur={handleBlur}
+                                            />
                                         </Stack>
                                         <Stack spacing={1} sx={{ mt: 1 }}>
                                             <InputLabel htmlFor="email">Email</InputLabel>
-                                            <OutlinedInput fullWidth id="email" value={email} name="email" onBlur={handleBlur} />
+                                            <OutlinedInput fullWidth disabled id="email" value={email} name="email" onBlur={handleBlur} />
                                         </Stack>
                                         <Divider fullWidth sx={{ mt: 2, mb: 2 }} />
                                         <Stack spacing={1} sx={{ mt: 1 }}>

@@ -95,9 +95,10 @@ function RuleExternalDialog(props) {
     }, [tacticsFilter, dataSourceFilter, searchFilter]);
 
     useEffect(() => {
+        if (!open) return;
         fetchATTACKTactics();
         fetchDataSources();
-    }, []);
+    }, [open]);
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="xl">
@@ -175,7 +176,7 @@ function RuleExternalDialog(props) {
                                 rules={rules}
                                 page={rulesPage}
                                 pagesNumber={rulesPages}
-                                pChange={(event, value) => setRulesPage(value)}
+                                pChange={(e, value) => setRulesPage(value)}
                                 importRule={(id) => batchImport([id])}
                             />
                         ) : (

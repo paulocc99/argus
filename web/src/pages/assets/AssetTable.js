@@ -1,11 +1,24 @@
 import { useState } from 'react';
 
-import { Box, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Typography, Pagination, Chip } from '@mui/material';
+import {
+    Box,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow,
+    Typography,
+    Pagination,
+    Chip,
+    IconButton,
+    Tooltip
+} from '@mui/material';
 import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import { WindowsFilled, LinuxOutlined } from '@ant-design/icons';
 
-import Vertical from 'components/@extended/Vertical';
 import { capitalizeWord, eventsNumberPretty } from 'utils';
 import SortedTableHead, { stableSort, getComparator } from 'common/SortedTableHead';
 import { TableContainerStyle, TableRowStyle, TableStyle } from 'themes/overrides/Table';
@@ -41,18 +54,12 @@ const headCells = [
         disablePadding: true,
         label: 'IP'
     },
-    /*    {
-        id: 'mac',
-        align: 'left',
-        disablePadding: false,
-        label: 'MAC'
-    },*/
-    {
-        id: 'datasource',
-        align: 'left',
-        disablePadding: false,
-        label: 'Datasources'
-    },
+    // {
+    //     id: 'datasource',
+    //     align: 'left',
+    //     disablePadding: false,
+    //     label: 'Datasources'
+    // },
     {
         id: 'managed',
         align: 'left',
@@ -73,16 +80,6 @@ const headCells = [
     }
 ];
 
-const AlertType = ({ type, panic }) => {
-    return (
-        <Stack direction="row" spacing={1} alignItems="center">
-            <Vertical color={type == 'alert' ? 'warning' : 'error'} />
-            <Typography>{capitalizeWord(type)}</Typography>
-            {type == 'alarm' && panic && <CrisisAlertIcon />}
-        </Stack>
-    );
-};
-
 const OSBanner = ({ os }) => {
     const osIcon = {
         windows: <WindowsFilled />,
@@ -91,11 +88,6 @@ const OSBanner = ({ os }) => {
 
     if (!os) return <></>;
     return (
-        // <Stack direction="row" spacing={1} alignItems="center">
-        //     <Vertical color={type == 'alert' ? 'warning' : 'error'} />
-        //     <Typography>{capitalizeWord(type)}</Typography>
-        //     {type == 'alarm' && panic && <CrisisAlertIcon />}
-        // </Stack>
         <Stack direction="row" spacing={1} alignItems="center">
             {osIcon[os.type]}
             <Typography>
@@ -106,12 +98,17 @@ const OSBanner = ({ os }) => {
 };
 
 export default function AssetTable(props) {
-    const { assets, updateSelected, page, pagesNumber, hChange } = props;
+    const { assets, updateSelected, page, pagesNumber, hChange, validate } = props;
 
     const [order] = useState('desc');
     const [orderBy] = useState('managed');
     const [selected, setSelected] = useState({});
     const isSelected = (uuid) => selected == uuid;
+
+    const handleValidation = (e, asset) => {
+        e.stopPropagation();
+        validate(asset);
+    };
 
     return (
         <Box>
@@ -121,10 +118,14 @@ export default function AssetTable(props) {
                     <TableBody>
                         {stableSort(assets, getComparator(order, orderBy)).map((asset, index) => {
                             const isItemSelected = isSelected(asset.uuid);
+                            const assetTStyle = {
+                                bgcolor: asset.validated == false && 'rgba(255, 165, 0, 0.15) !important',
+                                ...TableRowStyle
+                            };
                             return (
                                 <TableRow
                                     hover
-                                    sx={TableRowStyle}
+                                    sx={assetTStyle}
                                     tabIndex={-1}
                                     key={asset.uuid}
                                     selected={isItemSelected}
@@ -134,17 +135,15 @@ export default function AssetTable(props) {
                                     }}
                                 >
                                     <TableCell align="left">{asset.name}</TableCell>
-                                    {/* <TableCell align="left">{row.model}</TableCell> */}
                                     <TableCell align="left">
                                         <OSBanner os={asset.os} />
                                     </TableCell>
-                                    {/*<TableCell align="left">{asset.vendor}</TableCell>*/}
                                     <TableCell align="left">{asset.ip[0]}</TableCell>
-                                    <TableCell align="left" size="small">
+                                    {/*                                    <TableCell align="left" size="small">
                                         {asset.datasource.map((p) => (
                                             <Chip label={capitalizeWord(p)} key={p} sx={{ ml: 1 }} />
                                         ))}
-                                    </TableCell>
+                                    </TableCell>*/}
                                     <TableCell align="left">
                                         {asset.managed ? (
                                             <Chip label="MANAGED" color="primary" />
@@ -166,6 +165,15 @@ export default function AssetTable(props) {
                                             <Typography>{asset.stats.alerts}</Typography>
                                         </Stack>
                                     </TableCell>
+                                    {!asset.validated && (
+                                        <TableCell align="right">
+                                            <IconButton color="primary" aria-label="action" onClick={(e) => handleValidation(e, asset)}>
+                                                <Tooltip title="Verify asset" placement="right">
+                                                    <VerifiedIcon />
+                                                </Tooltip>
+                                            </IconButton>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             );
                         })}

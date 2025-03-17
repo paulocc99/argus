@@ -78,8 +78,9 @@ const RuleList = () => {
 
     const importExternalRule = async (ids) => {
         try {
-            await postImportRule(ids);
-            setSuccess('Rules imported with success');
+            const { data } = await postImportRule(ids);
+            const message = `Rules imported: ${data.results.success}, skipped: ${data.results.skipped}`;
+            setSuccess(message);
         } catch (error) {
             setError(error, 'Error on rule import');
         }

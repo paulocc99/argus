@@ -38,17 +38,26 @@ import { intervalsList } from 'common/List';
 import { TabPanel, a11yProps } from 'common/TabPanel';
 import AlertSummary from 'components/AlertSummary';
 import MainCard from 'components/cards/MainCard';
-// import DatePicker from 'components/DatePicker';
 import NoData from 'components/NoData';
+import FabPopover from 'components/FabPopover';
 import { setError, setSuccess } from 'utils';
 import { fabStyle, listSummaryStyle } from 'themes/other';
 
-import { getBaselineSettings, getBaselineAnalytics, getBaselineAlerts, updateBaselineAnalytic, postBaselineSettings } from 'api';
-import { deleteBaselineAnalytics, getAlerts, postBaselineAnalytic } from 'api';
+import {
+    getAlerts,
+    getBaselineSettings,
+    getBaselineAnalytics,
+    updateBaselineAnalytic,
+    updateBaselineAnalyticStatus,
+    postBaselineSettings,
+    postBaselineAnalytic,
+    deleteBaselineAnalytics
+} from 'api';
 import ProtocolsTable from './ProtocolsTable';
 import AnalyticsTable from './AnalyicsTable';
 import AnalyticDialog from './AnalyticDialog';
 import AlertDialog from '../alerts/AlertDialog';
+import AnalyticImportDialog from './import/AnalyticImportDialog';
 
 const analyticPlaceholder = {
     name: '',
@@ -96,6 +105,8 @@ const Baseline = () => {
     const [flowsData, setFlowsData] = useState({ nodes: [], links: [] });
     const [assetProtcols, setAssetProtocols] = useState([]);
 
+    const [importDialog, setImportDialog] = useState(false);
+
     // Handlers
     const handleTabChange = (event, newValue) => {
         setTab(newValue);
@@ -117,14 +128,18 @@ const Baseline = () => {
         }
     };
 
+    const handleAddRule = (type) => {
+        if (type == 0) {
+            setAction('new');
+            setSelectedAnalytic(analyticPlaceholder);
+        } else {
+            setImportDialog(true);
+        }
+    };
+
     const handleDelete = async () => {
         await removeAnalytic(selectedAnalytic.code);
         handleClose();
-    };
-
-    const handleNewAnalytic = () => {
-        setAction('new');
-        setSelectedAnalytic(analyticPlaceholder);
     };
 
     const handleOpenAnalytic = (analytic) => {
@@ -137,7 +152,6 @@ const Baseline = () => {
     };
 
     const handleAlertStateUpdate = (state) => {
-        console.log(state);
         setSelectedAlert({ ...selectedAlert, status: state });
     };
 
@@ -150,52 +164,7 @@ const Baseline = () => {
 
     const generateDataFlows = (data, assets) => {
         const flows = { nodes: [], links: [] };
-        // const data = [
-        //     {
-        //         count: 3753883,
-        //         ips: ['192.168.95.2', '192.168.95.12']
-        //     },
-        //     {
-        //         count: 3753883,
-        //         ips: ['192.168.95.2', '192.168.95.13']
-        //     },
-        //     {
-        //         count: 3753860,
-        //         ips: ['192.168.95.2', '192.168.95.11']
-        //     },
-        //     {
-        //         count: 3529040,
-        //         ips: ['192.168.95.2', '192.168.95.10']
-        //     },
-        //     {
-        //         count: 1877135,
-        //         ips: ['192.168.95.2', '192.168.95.14']
-        //     },
-        //     {
-        //         count: 1877109,
-        //         ips: ['192.168.95.2', '192.168.95.15']
-        //     },
-        //     {
-        //         count: 619100,
-        //         ips: ['192.168.90.5', '192.168.95.2']
-        //     },
-        //     {
-        //         count: 619100,
-        //         ips: ['192.168.90.115', '192.168.95.100']
-        //     },
-        //     {
-        //         count: 619100,
-        //         ips: ['192.168.95.100', '192.168.95.2']
-        //     },
-        //     {
-        //         count: 619100,
-        //         ips: ['192.168.95.100', '192.168.95.2']
-        //     },
-        //     {
-        //         count: 619100,
-        //         ips: ['192.168.90.115', '192.168.90.5']
-        //     }
-        // ];
+
         data.forEach((f) => {
             for (const ip of f.ips) {
                 if (!flows.nodes.find((flow) => flow.id == ip)) {
@@ -205,7 +174,7 @@ const Baseline = () => {
                         name: asset?.name || ip
                         // name: ipAsset ? `${ipAsset.name}\n(${ip})` : ip
                     };
-                    console.log(asset);
+                    // Set warning color on node that is not validated
                     if (asset && asset?.validated == false) node.color = 'orange';
                     flows.nodes.push(node);
                 }
@@ -217,25 +186,7 @@ const Baseline = () => {
             });
         });
 
-        // flows.nodes.push({
-        //     id: '192.168.95.20',
-        //     name: '192.168.95.20',
-        //     color: 'orange'
-        // });
-        // flows.links.push({
-        //     source: '192.168.95.20',
-        //     target: '192.168.95.2',
-        //     value: 3
-        // });
-
         return flows;
-    };
-
-    const getNodeColor = (node) => {
-        if (node.id === 2) {
-            return 'red'; // Custom color for node with ID "2"
-        }
-        return '#69b3a2'; // Default color for other nodes
     };
 
     // API
@@ -243,7 +194,7 @@ const Baseline = () => {
         try {
             const response = await getBaselineSettings();
             const { settings, flows, assets } = response.data;
-            setFromDate(moment(settings.baseline_time_range.beginning));
+            setFromDate(moment(settings.baseline_time_range.start));
             setToDate(moment(settings.baseline_time_range.end));
             setFlowsData(generateDataFlows(flows, assets));
             setAssetProtocols(assets);
@@ -256,7 +207,7 @@ const Baseline = () => {
             setHighConnectsPct(settings.high_asset_connections_pct);
             setHighConnectionsIntervals(settings.high_asset_connections_intervals);
         } catch (error) {
-            setError("Couldn't retrieve baseline settings.", error.message);
+            setError(error, "Couldn't retrieve baseline settings.");
         }
     };
 
@@ -270,7 +221,7 @@ const Baseline = () => {
             const response = await getAlerts(params);
             setAlerts(response.data);
         } catch (error) {
-            setError("Counln't retrieve baseline alerts.", error.message);
+            setError(error, "Counln't retrieve baseline alerts.");
         }
     };
 
@@ -280,7 +231,7 @@ const Baseline = () => {
             const { analytics } = response.data;
             setAnalyticList(analytics);
         } catch (error) {
-            setError("Counln't retrieve baseline analytics.", error.message);
+            setError(error, "Counln't retrieve baseline analytics.");
         }
     };
 
@@ -290,7 +241,7 @@ const Baseline = () => {
             setSuccess('Analytic created.');
             fetchBaselineAnalytics();
         } catch (error) {
-            setError('Error on analytic update.', error.message);
+            setError(error, "Coudn't create analytic.");
         }
     };
 
@@ -302,18 +253,17 @@ const Baseline = () => {
             fetchBaselineAnalytics();
             setChangesMade(false);
         } catch (error) {
-            setError('Error on analytic update.', error.message);
+            setError(error, 'Error on analytic update.');
         }
     };
 
     const updateAnalyticState = async (id, active) => {
         try {
-            const state = { active: active };
-            await updateBaselineAnalytic(id, state);
+            await updateBaselineAnalyticStatus(id, active);
             setSuccess('Analytic state updated.');
             fetchBaselineAnalytics();
         } catch (error) {
-            setError('Error on analytic state update.', error.message);
+            setError(error, 'Error on analytic state update.');
         }
     };
 
@@ -323,7 +273,7 @@ const Baseline = () => {
             setSuccess('Analytic deleted.');
             fetchBaselineAnalytics();
         } catch (error) {
-            setError('Error on analytic deletion.', error.message);
+            setError(error, 'Error on analytic deletion.');
         }
     };
 
@@ -337,13 +287,13 @@ const Baseline = () => {
                 high_asset_connections: onHighAssetConnections,
                 high_asset_connections_pct: parseInt(highConnectionsPct),
                 high_asset_connections_intervals: highConnectionsIntervals,
-                baseline_time_range: { beginning: fromDate, end: toDate }
+                baseline_time_range: { start: fromDate, end: toDate }
             };
             await postBaselineSettings(data);
             setSuccess('Baseline settings updated.');
             setChangesMade(false);
         } catch (error) {
-            setError('Error on baseline settings update.', error.message);
+            setError(error, 'Error on baseline settings update.');
         }
     };
 
@@ -370,9 +320,9 @@ const Baseline = () => {
         if (!alertOpen) setSelectedAlert(undefined);
     }, [alertOpen]);
 
-    useEffect(() => {
-        if (onNewAssetProtocols || onNewAssetProtocolsPort) getBaseline();
-    }, [onNewAssetProtocols, onNewAssetProtocolsPort]);
+    // useEffect(() => {
+    //     if (onNewAssetProtocols || onNewAssetProtocolsPort) getBaseline();
+    // }, [onNewAssetProtocols, onNewAssetProtocolsPort]);
 
     return (
         <ComponentSkeleton>
@@ -643,9 +593,7 @@ const Baseline = () => {
             >
                 <SaveIcon />
             </Fab>
-            <Fab color="primary" sx={fabStyle} onClick={handleNewAnalytic}>
-                <AddIcon />
-            </Fab>
+            <FabPopover icon={<AddIcon />} func={handleAddRule} />
             <AnalyticDialog
                 open={aOpen}
                 handleClose={handleClose}
@@ -656,12 +604,7 @@ const Baseline = () => {
                 action={action}
             />
             <AlertDialog open={alertOpen} alert={selectedAlert} close={() => setAlertOpen(false)} />
-            {/*            <BaselineAlertDialog
-                open={alertOpen}
-                close={() => setSelectedAlert(false)}
-                alert={selectedAlert}
-                setState={handleAlertStateUpdate}
-            />*/}
+            <AnalyticImportDialog open={importDialog} refresh={() => fetchBaselineAnalytics()} close={() => setImportDialog(false)} />
         </ComponentSkeleton>
     );
 };

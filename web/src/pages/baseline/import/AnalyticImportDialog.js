@@ -19,6 +19,10 @@ function AnalyticImportDialog(props) {
 
     const [searchFilter, setSearchFilter] = useState('');
 
+    const handleAllImport = () => {
+        importAnalytics(['ALL']);
+    };
+
     // API
     const fetchAnalyticsForImport = async () => {
         try {
@@ -36,12 +40,11 @@ function AnalyticImportDialog(props) {
         }
     };
 
-    const importAllAnalytics = async () => {
+    const importAnalytics = async (analyticList) => {
         try {
-            await postBaselineAnalyticImport(['ALL']);
+            await postBaselineAnalyticImport(analyticList);
             setSuccess('Import completed');
             refresh();
-            close();
         } catch (error) {
             setError(error, "Couldn't import analytics");
         }
@@ -87,7 +90,7 @@ function AnalyticImportDialog(props) {
                         page={analyticsPage}
                         pagesNumber={analyticsPages}
                         pChange={(e, value) => setAnalyticsPage(value)}
-                        callImport={importAllAnalytics}
+                        callImport={importAnalytics}
                     />
                 ) : (
                     <NoData message="No native analytics available for import." height="300px" />
@@ -95,7 +98,7 @@ function AnalyticImportDialog(props) {
             </DialogContent>
             <Divider />
             <DialogActions>
-                <Button disabled={!analyticsSize > 0} variant="contained" onClick={importAllAnalytics}>
+                <Button disabled={!analyticsSize > 0} variant="contained" onClick={handleAllImport}>
                     Import All ({analyticsSize})
                 </Button>
             </DialogActions>

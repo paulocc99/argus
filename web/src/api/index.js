@@ -59,17 +59,8 @@ export async function getAssets(params) {
     return await apiClient.get('/assets', { params });
 }
 
-// TODO - move data to original call function
 export async function updateAsset(asset) {
-    const data = {
-        name: asset.name,
-        description: asset.description,
-        vendor: asset.vendor,
-        os: asset.os,
-        hidden: asset.hidden,
-        network: asset.network
-    };
-    return await apiClient.put(`/assets/${asset.uuid}`, data);
+    return await apiClient.put(`/assets/${asset.uuid}`, asset);
 }
 
 export async function getAssetAlerts(id, page) {
@@ -139,6 +130,10 @@ export async function postBaselineAnalytic(analytic) {
 
 export async function updateBaselineAnalytic(id, analytic) {
     return await apiClient.put(`/baseline/analytics/${id}`, analytic);
+}
+
+export async function updateBaselineAnalyticStatus(id, state) {
+    return await apiClient.put(`/baseline/analytics/${id}/status`, { status: state });
 }
 
 export async function postProfileAnalytic(analytic) {
@@ -286,9 +281,9 @@ async function getLoginToken() {
     return await apiClient.get('/auth/login');
 }
 
-export async function postLogin(email, password) {
+export async function postLogin(username, password) {
     await getLoginToken();
-    const loginData = { email: email, password: password };
+    const loginData = { username: username, password: password };
     return await apiClient.post('/auth/login', loginData);
 }
 
@@ -298,12 +293,12 @@ export async function postLogout() {
 
 // Health & Setup
 export async function getHealth() {
-    return await apiClient.get('/health');
+    return await apiClient.get('/health/');
 }
 
-export async function postSetup(email, password) {
+export async function postSetup(username, email, password) {
     // await getLoginToken();
-    const loginData = { email: email, password: password };
+    const loginData = { username: username, email: email, password: password };
     return await apiClient.post('/setup', loginData);
 }
 

@@ -4,11 +4,11 @@ import { useSearchParams } from 'react-router-dom';
 import { Grid, Stack, Typography, MenuItem } from '@mui/material';
 
 import { getAlerts, getAssets, updateAlertStatus } from 'api';
+import { setError, setSuccess, n } from 'utils';
 import ComponentSkeleton from 'common/ComponentSkeleton';
 import FilterTextField from 'components/FilterTextField';
 import MainCard from 'components/cards/MainCard';
 import { riskList, statusList, typeList, sourceList } from 'common/List';
-import { setError, setSuccess, n } from 'utils';
 import AlertTable from './AlertTable';
 import AlertDialog from './AlertDialog';
 
@@ -90,9 +90,14 @@ const AlertList = () => {
         }
     };
 
+    // Hooks
     useEffect(() => {
         fetchAssets();
     }, []);
+
+    useEffect(() => {
+        fetchAlerts();
+    }, [page]);
 
     useEffect(() => {
         if (selectedAlert) setAlertDialog(true);
@@ -103,16 +108,13 @@ const AlertList = () => {
     }, [alertDialog]);
 
     useEffect(() => {
-        fetchAlerts();
-    }, [, page]);
-
-    useEffect(() => {
         let alertSource = searchParams.get('type');
         if (alertSource) setSourceFilter(searchParams.get('type'));
     }, [searchParams]);
 
     useEffect(() => {
         if (page === 1) {
+            if (!alertList.length) return;
             fetchAlerts();
             return;
         }

@@ -54,7 +54,7 @@ export default function DashboardDefault() {
             const response = await getStats();
             setStats(response.data);
         } catch (error) {
-            setError('Error while retriving statistics.', error.message);
+            setError(error, 'Error while retriving statistics.');
         } finally {
             setLoadingStats(false);
         }

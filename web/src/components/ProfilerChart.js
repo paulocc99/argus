@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+
 import { useTheme } from '@mui/material/styles';
 import ReactApexChart from 'react-apexcharts';
 
@@ -14,7 +15,6 @@ const areaChartOptions = {
     chart: {
         id: 'area-datetime',
         type: 'area',
-        height: 350,
         zoom: {
             autoScaleYaxis: true
         }
@@ -28,10 +28,6 @@ const areaChartOptions = {
     },
     xaxis: {
         type: 'datetime'
-        //tickAmount: 6
-    },
-    yaxis: {
-        tickAmount: 5
     }
 };
 
@@ -49,11 +45,10 @@ const getCategoryLabels = (slot, data) => {
 
 const getSeriesData = (slot, data) => {
     if (data.length == 0) {
-        return slot === 'month' ? [76, 85, 101, 98, 87, 105, 91, 114, 94, 86, 115, 35] : [31, 40, 28, 51, 42, 109, 100];
+        return [];
     }
     const parsedValues = data.map((e) => e.value);
     if (slot == 'always' || slot == 'month' || slot == 'day') return parsedValues;
-    // console.log(parsedValues.slice(parsedValues.length - slotSize(slot)));
     return parsedValues.slice(parsedValues.length - slotSize(slot));
 };
 
@@ -88,6 +83,21 @@ const getAlertAnnotations = (ranges) => {
     return base;
 };
 
+const getMaxYFromConditions = (ranges) => {
+    let currentMax = 10;
+    if (!ranges) return currentMax;
+
+    for (const [type, conditions] of Object.entries(ranges)) {
+        for (const cond of conditions) {
+            const range = parseInt(cond.limit);
+            if (range > currentMax) {
+                currentMax = range * 1.05;
+            }
+        }
+    }
+    return currentMax;
+};
+
 const ProfilerChart = ({ type, slot, data, ranges }) => {
     const theme = useTheme();
 
@@ -102,6 +112,9 @@ const ProfilerChart = ({ type, slot, data, ranges }) => {
         setCategoryLabels(labels);
     }, [data, slot]);
 
+    const maxY = getMaxYFromConditions(ranges);
+    // TODO - retrieve data max value
+
     useEffect(() => {
         setOptions((prevState) => ({
             ...prevState,
@@ -109,13 +122,14 @@ const ProfilerChart = ({ type, slot, data, ranges }) => {
                 categories: categoryLabels
             },
             yaxis: {
-                max: 12,
+                max: maxY,
                 labels: {
                     style: {
                         colors: [secondary]
                     },
                     formatter: (value) => parseInt(value)
                 },
+                tickAmount: 5,
                 title: {
                     text: 'Value'
                 }
@@ -135,8 +149,8 @@ const ProfilerChart = ({ type, slot, data, ranges }) => {
     const [series, setSeries] = useState([
         {
             type: 'area',
-            name: 'Page Views',
-            data: [1, 2, 3, 4, 5, 6, 7]
+            name: 'Value',
+            data: []
         }
     ]);
 

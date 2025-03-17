@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Divider } from '@mui/material';
 import Button from '@mui/material/Button';
 
 function ConfirmationDialog({ open, title, content, btn, color, onClose, onConfirm }) {
@@ -11,6 +11,7 @@ function ConfirmationDialog({ open, title, content, btn, color, onClose, onConfi
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>{title || defaultTitle}</DialogTitle>
             <DialogContent>{content || defaultContent}</DialogContent>
+            <Divider />
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
                 <Button onClick={onConfirm} variant="contained" color={color || defaultColorBtn}>

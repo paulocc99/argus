@@ -17,36 +17,23 @@ import {
     Tabs,
     Typography
 } from '@mui/material';
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-
-import { postLogout } from 'api';
+import { postLogout, getUserData } from 'api';
 import adminAvatar from 'assets/images/users/avatar.svg';
 import MainCard from 'components/cards/MainCard';
 import Transitions from 'components/@extended/Transitions';
+import { TabPanel, a11yProps } from 'common/TabPanel';
 import { setProfile } from 'store/reducers/user';
 import ProfileTab from './ProfileTab';
 import SettingTab from './SettingTab';
-import { getUserData } from 'api';
 
-function TabPanel({ children, value, index, ...other }) {
-    return (
-        <div role="tabpanel" hidden={value !== index} id={`profile-tabpanel-${index}`} aria-labelledby={`profile-tab-${index}`} {...other}>
-            {value === index && children}
-        </div>
-    );
-}
-
-function a11yProps(index) {
-    return {
-        id: `profile-tab-${index}`,
-        'aria-controls': `profile-tabpanel-${index}`
-    };
-}
+const iconBackColorOpen = 'grey.300';
 
 const Profile = () => {
     const theme = useTheme();
     const dispatch = useDispatch();
+
     const user = useSelector((state) => state.user);
     const { profile } = user;
 
@@ -71,6 +58,10 @@ const Profile = () => {
         setOpen(false);
     };
 
+    const handleChange = (e, newValue) => {
+        setValue(newValue);
+    };
+
     const fetchUserData = async () => {
         try {
             const response = await getUserData();
@@ -79,12 +70,6 @@ const Profile = () => {
             console.log(error.message);
         }
     };
-
-    const handleChange = (e, newValue) => {
-        setValue(newValue);
-    };
-
-    const iconBackColorOpen = 'grey.300';
 
     useEffect(() => {
         if (profile.username === undefined) fetchUserData();
@@ -202,9 +187,9 @@ const Profile = () => {
                                                 <TabPanel value={value} index={0} dir={theme.direction}>
                                                     <ProfileTab handleLogout={handleLogout} />
                                                 </TabPanel>
-                                                {/*                                                <TabPanel value={value} index={1} dir={theme.direction}>
+                                                <TabPanel value={value} index={1} dir={theme.direction}>
                                                     <SettingTab />
-                                                </TabPanel>*/}
+                                                </TabPanel>
                                             </>
                                         )}
                                     </MainCard>

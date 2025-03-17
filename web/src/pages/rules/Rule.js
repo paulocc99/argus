@@ -16,7 +16,8 @@ import {
     Select,
     Chip,
     TextField,
-    Fab
+    Fab,
+    Divider
 } from '@mui/material';
 
 import UploadIcon from '@mui/icons-material/Upload';
@@ -48,7 +49,7 @@ import RuleATTACKDialog from './RuleAttackDialog';
 import RuleProfilerDialog from './RuleProfilerDialog';
 import AlertDialog from '../alerts/AlertDialog';
 
-const EQLQuerBuilderOptions = ['Builder', 'Raw'];
+const EQLQuerBuilderOptions = ['Raw'];
 const triggerTypes = [
     { value: 'periodic', preview: 'Periodic' },
     { value: 'rule', preview: 'Rule Alert' }
@@ -325,7 +326,8 @@ function Rule() {
             }
             setSuccess(`Rule ${params.id ? 'Updated' : 'Created'}`);
         } catch (error) {
-            setError(error, `Error on rule ${params.id ? 'update' : 'creation'}`);
+            // setError(error, `Error on rule ${params.id ? 'update' : 'creation'}`);
+            setError(error);
         }
     };
 
@@ -450,11 +452,11 @@ function Rule() {
     return (
         <ComponentSkeleton>
             <Grid container spacing={3}>
-                <Grid item xs={12} lg={6}>
+                <Grid item xs={12} lg={6} uhd={4}>
                     <Stack spacing={3}>
                         <MainCard title={params.id ? 'Edit Rule' : 'Add New Rule'}>
                             <Box sx={{ minWidth: 120 }}>
-                                <Stack spacing={3}>
+                                <Stack spacing={3} sx={{ mb: 2 }}>
                                     <TextField id="rule-name" name="name" label="Name" value={ruleData.name} onChange={handleRuleUpdate} />
                                     <TextField
                                         id="rule-description"
@@ -566,6 +568,7 @@ function Rule() {
                                                     labelId="rule-type-label"
                                                     name="type"
                                                     size="small"
+                                                    disabled={params.id}
                                                     value={ruleData.type}
                                                     onChange={handleRuleUpdate}
                                                 >
@@ -621,6 +624,7 @@ function Rule() {
                                         builder={EQLBuilder}
                                     />
                                 </Stack>
+                                <Divider />
                                 <Grid container justifyContent="space-between" sx={{ mt: 2 }}>
                                     {params.id ? (
                                         <Button color="error" variant="outlined" component="label" onClick={confirmRuleDelete}>
@@ -653,7 +657,7 @@ function Rule() {
                         </MainCard>
                     </Stack>
                 </Grid>
-                <Grid item xs={12} lg={6}>
+                <Grid item xs={12} lg={6} uhd={4}>
                     <Grid sx={{ mb: 1 }} item>
                         <Typography variant="h5">Intelligence</Typography>
                     </Grid>

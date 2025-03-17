@@ -53,13 +53,14 @@ const AuthSetup = () => {
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
-                    username: Yup.string().email('Must be a valid email').max(255).required('Username is required'),
+                    username: Yup.string().max(255).required('Username is required'),
+                    email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
                     password: Yup.string().max(255).required('Password is required')
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
                         setStatus({ success: false });
-                        await postSetup(values.username, values.password);
+                        await postSetup(values.username, values.email, values.password);
                         await new Promise((resolve) => setTimeout(resolve, 5000));
                         await postLogin(values.username, values.password);
                         localStorage.setItem('auth', true);
@@ -90,8 +91,29 @@ const AuthSetup = () => {
                                         error={Boolean(touched.username && errors.username)}
                                     />
                                     {touched.username && errors.username && (
-                                        <FormHelperText error id="standard-weight-helper-text-email-login">
+                                        <FormHelperText error id="standard-weight-helper-text-username-login">
                                             {errors.username}
+                                        </FormHelperText>
+                                    )}
+                                </Stack>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Stack spacing={1}>
+                                    <InputLabel htmlFor="user-email">Email</InputLabel>
+                                    <OutlinedInput
+                                        id="user-email"
+                                        type="text"
+                                        value={values.email}
+                                        name="email"
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        placeholder="Email"
+                                        fullWidth
+                                        error={Boolean(touched.email && errors.email)}
+                                    />
+                                    {touched.email && errors.email && (
+                                        <FormHelperText error id="standard-weight-helper-text-email-login">
+                                            {errors.email}
                                         </FormHelperText>
                                     )}
                                 </Stack>

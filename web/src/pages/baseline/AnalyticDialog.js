@@ -19,7 +19,8 @@ import {
     OutlinedInput,
     MenuItem,
     Chip,
-    Autocomplete
+    Autocomplete,
+    Divider
 } from '@mui/material';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 
@@ -448,6 +449,7 @@ export default function AnalyticDialog(props) {
                     </ComponentLoader>
                 </TabPanel>
             </DialogContent>
+            <Divider />
             <DialogActions style={{ justifyContent: 'space-between' }}>
                 {action !== 'new' ? <Button onClick={remove}>Delete</Button> : <br></br>}
                 <Box sx={{ display: 'flex', gap: 2 }}>

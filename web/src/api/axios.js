@@ -12,7 +12,6 @@ const axiosClient = axios.create({
 axiosClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        // console.log(error.response);
         if ([401].includes(error.response.status)) {
             localStorage.clear();
             window.location = '/login';

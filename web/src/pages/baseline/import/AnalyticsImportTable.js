@@ -5,8 +5,7 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
 import SortedTableHead, { getComparator, stableSort } from 'common/SortedTableHead';
 import { TableContainerStyle, TableRowStyle, TableStyle } from 'themes/overrides/Table';
-import { capitalizeWord, setError, setSuccess } from 'utils';
-import { postBaselineAnalyticImport } from 'api';
+import { capitalizeWord } from 'utils';
 
 const headCells = [
     {
@@ -42,7 +41,7 @@ const headCells = [
 ];
 
 export default function AnalyticsImportTable(props) {
-    const { analytics, page, pagesNumber, pChange } = props;
+    const { analytics, page, pagesNumber, pChange, callImport } = props;
 
     const [running, setRunning] = useState([]);
     const [order] = useState('asc');
@@ -50,15 +49,10 @@ export default function AnalyticsImportTable(props) {
 
     const importAnalytic = async (e, code) => {
         e.stopPropagation();
-        try {
-            setRunning([...running, code]);
-            await postBaselineAnalyticImport([code]);
-            setSuccess('Analytic import with success.');
-        } catch (error) {
-            setError(error, "Couln't import analytics");
-        } finally {
-            setRunning([...running].filter((e) => e != code));
-        }
+
+        setRunning([...running, code]);
+        await callImport([code]);
+        setRunning([...running].filter((e) => e != code));
     };
 
     return (

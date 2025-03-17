@@ -7,7 +7,7 @@ import { AlertStatus } from 'common/Status';
 import AuthSetup from './auth-forms/AuthSetup';
 import AuthWrapper from './AuthWrapper';
 
-const Register = () => {
+const Setup = () => {
     const [status, setStatus] = useState({});
 
     const fetchStatus = async () => {
@@ -47,4 +47,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default Setup;

@@ -164,7 +164,7 @@ const SigmaRepositories = () => {
     return (
         <ComponentSkeleton>
             <Grid container spacing={3}>
-                <Grid item xs={8} lg={10}>
+                <Grid item xs={12} lg={10} uhd={8}>
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <Typography variant="h5">Sigma Repositories</Typography>
