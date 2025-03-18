@@ -48,7 +48,7 @@ export default function AssetActiveTable(props) {
                 <Table sx={TableStyle}>
                     <SortedTableHead order={order} orderBy={orderBy} headCells={headCells} />
                     <TableBody>
-                        {stableSort(assets, getComparator(order, orderBy)).map((asset, index) => {
+                        {stableSort(assets, getComparator(order, orderBy)).map((asset) => {
                             return (
                                 <TableRow hover sx={TableRowStyle} tabIndex={-1} key={asset.name}>
                                     <TableCell align="left">{asset.name}</TableCell>

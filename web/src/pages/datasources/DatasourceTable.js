@@ -56,7 +56,7 @@ export default function DatasourceTable(props) {
                 <Table sx={TableStyle}>
                     <SortedTableHead order={order} orderBy={orderBy} headCells={headCells} />
                     <TableBody>
-                        {stableSort(datasources, getComparator(order, orderBy)).map((ds, index) => {
+                        {stableSort(datasources, getComparator(order, orderBy)).map((ds) => {
                             const isItemSelected = isSelected(ds.name);
 
                             return (

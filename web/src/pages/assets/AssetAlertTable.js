@@ -67,10 +67,7 @@ export default function AssetAlertTable(props) {
                                 <TableRow
                                     hover
                                     role="checkbox"
-                                    sx={{
-                                        '&:last-child td, &:last-child th': { border: 0 },
-                                        bgcolor: alert.type == 'alarm' && alert.panic && 'rgba(255, 0, 0, 0.2) !important'
-                                    }}
+                                    sx={TableRowStyle}
                                     aria-checked={isItemSelected}
                                     tabIndex={-1}
                                     key={alert.uuid}

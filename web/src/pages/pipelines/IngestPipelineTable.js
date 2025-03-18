@@ -49,7 +49,7 @@ export default function IngestPipelineTable(props) {
                 <Table sx={TableStyle}>
                     <SortedTableHead order={order} orderBy={orderBy} headCells={headCells} />
                     <TableBody>
-                        {stableSort(pipelines, getComparator(order, orderBy)).map((pipe, index) => {
+                        {stableSort(pipelines, getComparator(order, orderBy)).map((pipe) => {
                             const isItemSelected = isSelected(pipe.id);
                             return (
                                 <TableRow
