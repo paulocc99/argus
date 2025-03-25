@@ -30,6 +30,7 @@ import { statusList } from 'common/List';
 import MainCard from 'components/cards/MainCard';
 import { fabStyle } from 'themes/other';
 import SigmaRepositoryTable from './SigmaRepositoryTable';
+import SigmaRepoDialog from './SigmaRepoDialog';
 
 const repositoryPlaceholder = {
     name: '',
@@ -76,7 +77,6 @@ const SigmaRepositories = () => {
         } else if (action == 'new') {
             await createSigmaRepository();
         }
-        handleClose();
     };
 
     const handlePageChange = (e, value) => {
@@ -86,20 +86,6 @@ const SigmaRepositories = () => {
     const handleUpdateRepo = (e) => {
         setSelSigmaRepository({ ...selSigmaRepository, [e.target.name]: e.target.value });
     };
-
-    const updateRepoMappings = (e, index) => {
-        const sel = { ...selSigmaRepository };
-        sel.mappings[index][e.target.name] = e.target.value;
-        setSelSigmaRepository(sel);
-    };
-
-    const addDatasource = () => {
-        const sel = { ...selSigmaRepository };
-        sel.mappings.push({ datasources: [], path: '' });
-        setSelSigmaRepository(sel);
-    };
-
-    // TODO - Add mapping row deletion button on dialog
 
     // API
     const fetchDataSources = async () => {
@@ -127,6 +113,7 @@ const SigmaRepositories = () => {
             await postSigmaRepository(selSigmaRepository);
             setSuccess('Sigma repository created');
             fetchSigmaRepositories();
+            handleClose();
         } catch (error) {
             setError(error);
         }
@@ -138,6 +125,7 @@ const SigmaRepositories = () => {
             await updateSigmaRepository(selSigmaRepository.uuid, repo);
             setSuccess('Sigma repository updated');
             fetchSigmaRepositories();
+            handleClose();
         } catch (error) {
             setError(error);
         }
@@ -199,102 +187,15 @@ const SigmaRepositories = () => {
                     </MainCard>
                 </Grid>
             </Grid>
-
-            <Dialog open={dOpen} onClose={handleClose}>
-                <DialogContent sx={{ minWidth: '750px', minHeight: '300px' }}>
-                    <Grid item xs={12}>
-                        <Typography variant="h5">{capitalizeWord(action)} Repository</Typography>
-                    </Grid>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={6}>
-                            <FormControl fullWidth>
-                                <TextField
-                                    id="repo-name"
-                                    name="name"
-                                    value={selSigmaRepository?.name}
-                                    label="Name"
-                                    size="small"
-                                    onChange={handleUpdateRepo}
-                                />
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <FormControl fullWidth>
-                                <TextField
-                                    id="repo-path"
-                                    name="repository"
-                                    value={selSigmaRepository?.repository}
-                                    label="Repository"
-                                    size="small"
-                                    onChange={handleUpdateRepo}
-                                />
-                            </FormControl>
-                        </Grid>
-                    </Grid>
-                    <Grid item xs={12} sx={{ mt: 2, mb: 1 }}>
-                        <Typography variant="h5" sx={{ fontSize: '1rem' }}>
-                            Data Sources
-                        </Typography>
-                        <Grid container spacing={1} direction="row" justifyContent="center" alignItems="center" sx={{ mt: 1 }}>
-                            {selSigmaRepository?.mappings?.map((m, index) => (
-                                <>
-                                    <Grid item xs={6}>
-                                        <FormControl fullWidth>
-                                            <InputLabel id="mapping-name-label" sx={{ overflow: 'visible' }}>
-                                                Datasources
-                                            </InputLabel>
-                                            <Select
-                                                id="datasource"
-                                                labelId="mapping-name-label"
-                                                name="datasources"
-                                                size="small"
-                                                placeholder="Datasources"
-                                                multiple
-                                                value={m.datasources}
-                                                onChange={(e) => updateRepoMappings(e, index)}
-                                                input={<OutlinedInput id="select-multiple" label="Datasource" />}
-                                                renderValue={(selected) => (
-                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                        {selected.map((value) => (
-                                                            <Chip size="small" key={value} label={value} />
-                                                        ))}
-                                                    </Box>
-                                                )}
-                                            >
-                                                {dataSources.map((ds) => (
-                                                    <MenuItem key={ds.value} value={ds.value}>
-                                                        {ds.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <FormControl fullWidth>
-                                            <TextField
-                                                id="mapping-path"
-                                                name="path"
-                                                value={m.path}
-                                                label="Path"
-                                                size="small"
-                                                onChange={(e) => updateRepoMappings(e, index)}
-                                            />
-                                        </FormControl>
-                                    </Grid>
-                                </>
-                            ))}
-                            <IconButton aria-label="add" color="success" onClick={addDatasource}>
-                                <AddCircleIcon />
-                            </IconButton>
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    {action == 'edit' && <Button onClick={handleDelRepo}>Delete</Button>}
-                    <Button onClick={handleDialogSave}>Save</Button>
-                </DialogActions>
-            </Dialog>
-
+            <SigmaRepoDialog
+                open={dOpen}
+                repository={selSigmaRepository}
+                close={handleClose}
+                action={action}
+                save={handleDialogSave}
+                update={handleUpdateRepo}
+                del={handleDelRepo}
+            />
             <Fab onClick={handleNewRepo} color="primary" sx={fabStyle}>
                 <AddIcon />
             </Fab>

@@ -589,6 +589,7 @@ const Baseline = () => {
             <Fab
                 onClick={updateBaselineSettings}
                 color={changesMade ? 'primary' : 'gray'}
+                disabled={!changesMade}
                 sx={{ ...fabStyle, right: (theme) => theme.spacing(12) }}
             >
                 <SaveIcon />

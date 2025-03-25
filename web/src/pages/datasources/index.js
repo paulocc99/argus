@@ -42,15 +42,15 @@ const Datasources = () => {
         setDOpen(true);
     };
 
-    const handleDelDS = (name) => {
-        removeDatasource(name);
-        handleClose();
-    };
-
     const handleNewDS = () => {
         setSelDatasource(datasourcePlaceholder);
         setAction('new');
         setDOpen(true);
+    };
+
+    const handleDelDS = (name) => {
+        removeDatasource(name);
+        handleClose();
     };
 
     const handleUpdateDS = (attr, value) => {
@@ -82,7 +82,7 @@ const Datasources = () => {
             fetchDataSources();
             handleClose();
         } catch (error) {
-            setError(error, 'Error on datasource creation');
+            setError(error);
         }
     };
 
@@ -156,7 +156,7 @@ const Datasources = () => {
                 open={dOpen}
                 close={handleClose}
                 action={action}
-                updateDs={handleUpdateDS}
+                update={handleUpdateDS}
                 save={handleDialogSave}
                 del={handleDelDS}
             />

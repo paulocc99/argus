@@ -36,7 +36,7 @@ export default function SubnetDialog(props) {
                                 </Grid>
                             ))
                         ) : (
-                            <Typography variant="h6">No monitored subnets at the moment.</Typography>
+                            <Typography variant="h6">There are currently no subnets being monitored.</Typography>
                         )}
                     </Grid>
                     <IconButton aria-label="add" color="success" onClick={add} sx={{ mt: 2 }}>

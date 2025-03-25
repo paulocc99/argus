@@ -26,7 +26,7 @@ const AuthLogin = () => {
         <>
             <Formik
                 initialValues={{
-                    username: 'admin@argus.local',
+                    username: '',
                     password: '',
                     submit: null
                 }}

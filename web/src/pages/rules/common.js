@@ -271,11 +271,6 @@ export function Filter(props) {
             .catch((e) => console.log(e.message));
     };
 
-    // console.log(filter);
-    // console.log(suggestions);
-    // console.log(suggestions[filter.field]);
-    // console.log(suggestions['fileset.name']);
-
     return (
         <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
             {filter.type == 'simple' ? (

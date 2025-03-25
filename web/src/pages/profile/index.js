@@ -97,9 +97,8 @@ export default function Profile(props) {
                                     setStatus({ success: true });
                                     setSuccess('Password changed');
                                 } catch (err) {
-                                    console.error(err);
                                     setStatus({ success: false });
-                                    setErrors({ submit: err.message });
+                                    setErrors({ submit: err.response.data.response.errors });
                                 }
                                 setSubmitting(false);
                             }}

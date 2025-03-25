@@ -10,7 +10,8 @@ import {
     TextField,
     FormControlLabel,
     Stack,
-    Checkbox
+    Checkbox,
+    Divider
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
@@ -19,33 +20,35 @@ import { capitalizeWord } from 'utils';
 import { HTypography } from 'common/Typography';
 
 export default function DatasourceDialog(props) {
-    const { datasource, open, close, save, del, action, updateDs } = props;
+    const { datasource, open, close, save, del, action, update } = props;
 
     // Handlers
     const handleUpdate = (e) => {
-        updateDs(e.target.name, e.target.value);
+        update(e.target.name, e.target.value);
     };
 
     const handleDelete = () => {
         del(datasource.name);
     };
 
-    const updateIndice = (index, value) => {
-        const ds = { ...datasource };
-        ds.indices[index] = value;
-        updateDs('indices', ds.indices);
+    const updateIndice = (e, index) => {
+        const { indices } = { ...datasource };
+        indices[index] = e.target.value;
+        update('indices', indices);
     };
 
     const removeIndice = (index) => {
-        updateDs(
+        update(
             'indices',
             datasource.indices.filter((e, i, arr) => i !== index)
         );
     };
 
     const addIndice = () => {
-        updateDs('indices', datasource.indices.concat(''));
+        update('indices', datasource.indices.concat(''));
     };
+
+    const isBaseline = datasource?.name.toLowerCase() == 'baseline';
 
     return (
         <Dialog open={open} onClose={close} maxWidth="xs" fullWidth>
@@ -57,12 +60,12 @@ export default function DatasourceDialog(props) {
                     <Grid item xs={6}>
                         <FormControl fullWidth>
                             <TextField
-                                disabled={action == 'edit'}
                                 id="ds-name"
                                 name="name"
                                 value={datasource.name}
                                 label="Name"
                                 size="small"
+                                disabled={action == 'edit' || isBaseline}
                                 onChange={handleUpdate}
                             />
                         </FormControl>
@@ -75,6 +78,7 @@ export default function DatasourceDialog(props) {
                                 value={datasource?.module}
                                 label="Event Module"
                                 size="small"
+                                disabled={isBaseline}
                                 onChange={handleUpdate}
                             />
                         </FormControl>
@@ -85,32 +89,35 @@ export default function DatasourceDialog(props) {
                         Indices
                     </Typography>
                     <Grid container direction="row" justifyContent="center" alignItems="center" sx={{ mt: 1 }}>
-                        {datasource.indices.map((indice, index, indices) => (
-                            <Grid key={indice} container sx={{ mt: 1 }}>
+                        {datasource?.indices?.map((indice, index) => (
+                            <Grid container key={`indice-${index}`} sx={{ mt: 1 }}>
                                 <Grid item xs={10}>
                                     <FormControl fullWidth>
                                         <TextField
-                                            key={indice}
+                                            id="indice"
                                             error={indice.length == 0}
-                                            defaultValue=""
                                             value={indice}
                                             label="Indice"
                                             size="small"
                                             placeholder="filebeat-*"
-                                            onChange={(e) => updateIndice(index, e.target.value)}
+                                            onChange={(e) => updateIndice(e, index)}
                                         />
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={2} sx={{ pl: 3 }}>
-                                    <IconButton onClick={() => removeIndice(index)}>
-                                        <RemoveCircleIcon fontSize="small" />
-                                    </IconButton>
-                                </Grid>
+                                {!isBaseline && (
+                                    <Grid item xs={2} sx={{ pl: 3 }}>
+                                        <IconButton onClick={() => removeIndice(index)}>
+                                            <RemoveCircleIcon fontSize="small" />
+                                        </IconButton>
+                                    </Grid>
+                                )}
                             </Grid>
                         ))}
-                        <IconButton aria-label="add" color="success" onClick={addIndice}>
-                            <AddCircleIcon />
-                        </IconButton>
+                        {!isBaseline && (
+                            <IconButton aria-label="add" color="success" onClick={addIndice}>
+                                <AddCircleIcon />
+                            </IconButton>
+                        )}
                     </Grid>
                 </Grid>
                 <Grid item xs={12} sx={{ mt: 2 }}>
@@ -118,17 +125,35 @@ export default function DatasourceDialog(props) {
                         <HTypography variant="h5">Options</HTypography>
                         <FormControlLabel
                             control={
-                                <Checkbox name="lock" checked={datasource.lock} onChange={(e) => updateDs('lock', e.target.checked)} />
+                                <Checkbox
+                                    disabled={isBaseline}
+                                    name="lock"
+                                    checked={datasource.lock}
+                                    onChange={(e) => update('lock', e.target.checked)}
+                                />
                             }
                             label="Lock Indices"
                         />
                     </Stack>
                 </Grid>
             </DialogContent>
-            <DialogActions>
-                {action == 'edit' && <Button onClick={handleDelete}>Delete</Button>}
-                <Button onClick={save}>Save</Button>
-            </DialogActions>
+            {!isBaseline && (
+                <>
+                    <Divider />
+                    <DialogActions style={{ justifyContent: 'space-between' }}>
+                        {action == 'edit' ? (
+                            <Button color="error" onClick={handleDelete}>
+                                Delete
+                            </Button>
+                        ) : (
+                            <br />
+                        )}
+                        <Button variant="contained" onClick={save}>
+                            Save
+                        </Button>
+                    </DialogActions>
+                </>
+            )}
         </Dialog>
     );
 }
