@@ -1,7 +1,5 @@
 from flask import jsonify, current_app as app
 from datetime import datetime, timedelta
-from mongoengine.errors import FieldDoesNotExist
-import random
 
 from api.routes import api
 from builder import get_attr_count_agg, get_date_count_agg
@@ -19,7 +17,6 @@ def get_global_statistics():
     alerts_count = Alert.objects.count()
     assets_count = Asset.objects.count()
 
-    # app.mongo COUNT BY DAY
     alerts_last_30_days = {}
     events_last_30_days = {}
 
@@ -27,7 +24,7 @@ def get_global_statistics():
     for day in range(0, 30):
         d = start - timedelta(days=day)
         alerts_last_30_days[d.strftime("%Y-%m-%d")] = 0
-        events_last_30_days[d.strftime("%Y-%m-%d")] = random.randint(5000, 20000)
+        events_last_30_days[d.strftime("%Y-%m-%d")] = 0
 
     alerts_by_day = Alert.objects().aggregate(get_date_count_agg("$created_at"))
     for day in alerts_by_day:
@@ -99,8 +96,6 @@ def get_alert_statistics():
 
     assets = Asset.objects.all()
     for asset in assets:
-        # alerts = Alert.objects.all()
-        # alerts = alerts.filter(related_ips__in=asset.ip)
         alerts = BaseAlert.by_asset(asset)
         alert_count = len(alerts.filter(type="alert"))
         alarm_count = len(alerts.filter(type="alarm"))

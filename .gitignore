@@ -4,8 +4,8 @@
 *.db
 __pycache__
 
+node_modules
 .vscode
 .idea
 build
-
-**/trash
+trash

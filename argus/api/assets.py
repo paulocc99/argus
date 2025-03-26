@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from flask import current_app as app
 from http import HTTPStatus
+from mongoengine import ValidationError
 from mongoengine.errors import InvalidQueryError
 import math
 
@@ -223,12 +224,12 @@ def update_asset_settings():
     data = request.get_json()
     subnets = data.get("subnets", [])
 
-    if any(sub for sub in subnets if not AssetMonitoringSetting.verify(sub)):
-        return response("Invalid subnet provided"), HTTPStatus.BAD_REQUEST
-
-    asset_setting = AssetMonitoringSetting(subnets=subnets)
     try:
+        asset_setting = AssetMonitoringSetting(subnets=subnets)
+        asset_setting.validate()
         app.settings.update(monitoring=asset_setting)
+    except ValidationError as e:
+        return response(e.message), HTTPStatus.BAD_REQUEST
     except:
         return response("An error occured"), HTTPStatus.BAD_REQUEST
 

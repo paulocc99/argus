@@ -2,6 +2,7 @@ from __future__ import annotations
 from flask_security.core import UserMixin, RoleMixin
 from enum import EnumMeta, Enum
 from datetime import datetime, timedelta, timezone
+from ipaddress import IPv4Network
 from mongoengine import (
     Document,
     EmbeddedDocument,
@@ -86,23 +87,17 @@ class BaselineSettings(EmbeddedDocument):
 class AssetMonitoringSetting(EmbeddedDocument):
     subnets = ListField(StringField(required=True))
 
-    @classmethod
-    def verify(cls, cidr: str) -> bool:
-        from ipaddress import IPv4Network
-
+    def validate(self, clean=True):
+        super().validate(clean)
         try:
-            network = IPv4Network(cidr)
-            if not network.is_private:
-                return False
-                # raise ValidationError("CIDR is not private")
-            return True
-        except ValueError:
-            pass
-            # raise ValidationError("Malformed CIDR")
+            for sub in self.subnets:
+                network = IPv4Network(sub)
+                if not network.is_private:
+                    raise ValidationError("CIDR is not private")
+        except ValueError:          
+            raise ValidationError("Malformed CIDR")
         except Exception:
-            pass
-            # raise ValidationError("Other CIDR problem")
-        return False
+            raise ValidationError("Other CIDR problem")
 
 
 class Setting(Document):

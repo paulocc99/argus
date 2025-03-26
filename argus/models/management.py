@@ -6,9 +6,8 @@ from .core import TDocument
 
 
 class SigmaRepositoryMapping(EmbeddedDocument):
-    datasources = ListField(StringField(max_length=64), required=True)
+    datasources = ListField(StringField(min_length=1, max_length=64), required=True)
     path = StringField(required=True, max_length=128)
-    # rules = EmbeddedDocumentListField(SigmaRuleMetadata)
 
 
 class SigmaRepository(TDocument):
