@@ -1,7 +1,10 @@
 from flask import Blueprint
 from flask_security.decorators import auth_required
 
+from .management import mgmt
+
 api = Blueprint("api", __name__)
+api.register_blueprint(mgmt)
 
 
 @api.before_request

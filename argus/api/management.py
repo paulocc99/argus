@@ -1,22 +1,29 @@
-from flask import request, jsonify
+from flask import request, jsonify, Blueprint
 from flask import current_app as app
+from flask_security.decorators import roles_required 
 from mongoengine.errors import NotUniqueError, ValidationError
 from benedict import benedict
 from http import HTTPStatus
 import math
 import yaml
 
-from api.routes import api
 from api import response
 from constants import MAX_PER_PAGE
 from extensions import rule_feed
-from models.core import Datasource
+from models.core import Datasource, Roles
 from models.management import SigmaRepository, SigmaRuleMetadata
 from utils import to_dict
 
 
+mgmt = Blueprint("health", __name__, url_prefix="/management")
+
+@mgmt.before_request
+@roles_required(Roles.ADMINISTRATOR)
+def is_administrator():
+    pass
+
 ################## Datasources ##################
-@api.route("/management/datasources")
+@mgmt.route("/datasources")
 def get_datasources():
     result = []
     datasources = Datasource.objects.all()
@@ -34,7 +41,7 @@ def get_datasources():
     return jsonify(result)
 
 
-@api.route("/management/datasources", methods=["POST"])
+@mgmt.route("/datasources", methods=["POST"])
 def create_datasource():
     if not request.is_json:
         return response("Invalid JSON!"), HTTPStatus.BAD_REQUEST
@@ -42,7 +49,7 @@ def create_datasource():
     data = request.get_json()
 
     indices = data.get("indices", [])
-    if any(indice for indice in indices if not app.elastic.indice_exists(indice)):
+    if any(i.strip().lower() for i in indices if not (i and app.elastic.indice_exists(i) and i != "baseline")):
         return response("The provided indices do not exist."), HTTPStatus.BAD_REQUEST
 
     try:
@@ -64,7 +71,7 @@ def create_datasource():
     return response("Datasource created.")
 
 
-@api.route("/management/datasources/<name>", methods=["PUT"])
+@mgmt.route("/datasources/<name>", methods=["PUT"])
 def update_datasource(name):
     if not request.is_json:
         return response("Invalid JSON!"), HTTPStatus.BAD_REQUEST
@@ -91,7 +98,7 @@ def update_datasource(name):
     return response("Datasource updated.")
 
 
-@api.route("/management/datasources/<name>", methods=["DELETE"])
+@mgmt.route("/datasources/<name>", methods=["DELETE"])
 def delete_datasource(name):
     if name.strip().lower() == "baseline":
         return (
@@ -110,7 +117,7 @@ def delete_datasource(name):
     return response("Datasource deleted.")
 
 
-@api.route("/management/datasources/scan", methods=["POST"])
+@mgmt.route("/datasources/scan", methods=["POST"])
 def automatic_datasource_resolver():
     available_indices = app.elastic.get_all_data_streams()
     count = 0
@@ -131,7 +138,7 @@ def automatic_datasource_resolver():
 
 
 ################## Sigma Repos ##################
-@api.route("/management/sigma")
+@mgmt.route("/sigma")
 def get_sigma_repositories():
     result = []
     repos = SigmaRepository.objects.all()
@@ -144,7 +151,7 @@ def get_sigma_repositories():
     return jsonify(result)
 
 
-@api.route("/management/sigma", methods=["POST"])
+@mgmt.route("/sigma", methods=["POST"])
 def create_sigma_repository():
     if not request.is_json:
         return response("Invalid JSON!"), HTTPStatus.BAD_REQUEST
@@ -165,7 +172,7 @@ def create_sigma_repository():
     return response("Sigma repository created"), HTTPStatus.CREATED
 
 
-@api.route("/management/sigma/<repo_id>", methods=["PUT"])
+@mgmt.route("/sigma/<repo_id>", methods=["PUT"])
 def update_sigma_repository(repo_id):
     if not request.is_json:
         return response("Invalid JSON!"), HTTPStatus.BAD_REQUEST
@@ -183,7 +190,7 @@ def update_sigma_repository(repo_id):
     return response("Sigma repository updated")
 
 
-@api.route("/management/sigma/<repo_id>", methods=["DELETE"])
+@mgmt.route("/sigma/<repo_id>", methods=["DELETE"])
 def delete_sigma_repository(repo_id):
     repo = SigmaRepository.by_uuid(uuid=repo_id)
     if not repo:
@@ -201,7 +208,7 @@ def delete_sigma_repository(repo_id):
     return response("Sigma repository deleted")
 
 
-@api.route("/management/sigma/<repo_id>/sync", methods=["POST"])
+@mgmt.route("/sigma/<repo_id>/sync", methods=["POST"])
 def sync_sigma_repository(repo_id):
     if not request.is_json:
         return response("Invalid JSON!"), HTTPStatus.BAD_REQUEST
@@ -220,7 +227,7 @@ def sync_sigma_repository(repo_id):
     return response("Sigma repository sync started")
 
 
-@api.route("/management/sigma/<repo_id>/clear", methods=["POST"])
+@mgmt.route("/sigma/<repo_id>/clear", methods=["POST"])
 def clear_sigma_repository_rules(repo_id):
     if not request.is_json:
         return response("Invalid JSON!"), HTTPStatus.BAD_REQUEST
@@ -244,7 +251,7 @@ def clear_sigma_repository_rules(repo_id):
 
 
 ################## Pipelines ##################
-@api.route("/management/pipelines")
+@mgmt.route("/pipelines")
 def get_ingest_pipelines():
     page = request.args.get("page", type=int, default=None)
     if page and page < 0:
@@ -268,7 +275,7 @@ def get_ingest_pipelines():
     return jsonify(result)
 
 
-@api.route("/management/pipelines/upload", methods=["POST"])
+@mgmt.route("/pipelines/upload", methods=["POST"])
 def upload_ingest_pipeline():
     if "pipeline" not in request.files:
         return response("Please upload an pipeline"), HTTPStatus.BAD_REQUEST
@@ -280,7 +287,7 @@ def upload_ingest_pipeline():
     return jsonify(pipeline)
 
 
-@api.route("/management/pipelines", methods=["POST"])
+@mgmt.route("/pipelines", methods=["POST"])
 def update_ingest_pipeline():
     if not request.is_json:
         return response("Invalid JSON!"), HTTPStatus.BAD_REQUEST
@@ -299,7 +306,7 @@ def update_ingest_pipeline():
     return response("Pipeline updated")
 
 
-@api.route("/management/pipelines/<pipeline_id>", methods=["DELETE"])
+@mgmt.route("/pipelines/<pipeline_id>", methods=["DELETE"])
 def delete_ingest_pipeline(pipeline_id):
     try:
         result = app.elastic.delete_pipeline(pipeline_id)
